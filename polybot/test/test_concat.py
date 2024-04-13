@@ -28,7 +28,7 @@ class TestImgConcat(unittest.TestCase):
 
         small_image_width = actual_width // 2
 
-        # Check if the image width is divisible by 2
+        # Check if the images width is divisible by 2
         self.assertEqual(actual_width % 2, 0)
 
         left_half = [row[:small_image_width] for row in self.img.data]

@@ -60,7 +60,7 @@ Here is a detailed usage instruction for the class:
 Provide the path to the image file as a parameter when creating an instance of the `Img` class, for example:
 
 ```python
-my_img = Img('path/to/image.jpg')
+my_img = Img('path/to/images.jpg')
 ```
 
 #### Saving the modified image
@@ -93,10 +93,10 @@ Implementation instruction for horizontal concatenation:
 - Store the resulting concatenated image in the `self.data` attribute of the instance. 
 
 ```python
-my_img = Img('path/to/image.jpg')
+my_img = Img('path/to/images.jpg')
 another_img = Img('path/to/image2.jpg')
 my_img.concat(another_img) 
-my_img.save_img()   # concatenated image was saved in 'path/to/image_filtered.jpg'
+my_img.save_img()   # concatenated images was saved in 'path/to/image_filtered.jpg'
 ```
 
 Note: you can optionally use the `direction` argument to implement `vertical` concatenation as well.
@@ -116,9 +116,9 @@ Implementation instruction:
 
 
 ```python
-my_img = Img('path/to/image.jpg')
+my_img = Img('path/to/images.jpg')
 my_img.salt_n_pepper() 
-my_img.save_img()  # noisy image was saved in 'path/to/image_filtered.jpg'
+my_img.save_img()  # noisy images was saved in 'path/to/image_filtered.jpg'
 ```
 
 #### Rotating the image
@@ -129,10 +129,10 @@ Implementation remarks:
 The resulting rotated image will have its rows become the columns, and the columns will become the rows. The pixels in the rotated image will be repositioned based on a clockwise rotation around the center of the original image. For example, the first row in the original image will become the last column in the rotated image, the second row will become the second-to-last column, and so on.  
 
 ```python
-my_img = Img('path/to/image.jpg')
+my_img = Img('path/to/images.jpg')
 my_img.rotate() 
 my_img.rotate()  # rotate again for a 180 degrees rotation
-my_img.save_img()   # rotated image was saved in 'path/to/image_filtered.jpg'
+my_img.save_img()   # rotated images was saved in 'path/to/image_filtered.jpg'
 ```
 
 #### Segmenting the image
@@ -144,7 +144,7 @@ Implementation instruction:
  2. All pixels with an intensity greater than 100 are replaced with a white pixel (intensity 255) and all others are replaced with a black pixel (intensity 0). 
 
 ```python
-my_img = Img('path/to/image.jpg')
+my_img = Img('path/to/images.jpg')
 my_img.segment() 
 my_img.save_img()
 ```
@@ -159,7 +159,7 @@ The `blur()` method is already implemented. You can control the blurring level `
    It blurs the image by replacing the value of each pixel by the average of the 16 pixels around him (or any other value, controlled by the `blur_level` argument. The bigger the value, the stronger the blurring level).
 
 ```python
-my_img = Img('path/to/image.jpg')
+my_img = Img('path/to/images.jpg')
 my_img.blur()   # or my_img.blur(blur_level=32) for stronger blurring effect
 my_img.save_img()
 ```
@@ -169,7 +169,7 @@ my_img.save_img()
 The `contour()` method is already implemented. It applies a contour effect to the image by calculating the **differences between neighbor pixels** along each row of the image matrix.
 
 ```python
-my_img = Img('path/to/image.jpg')
+my_img = Img('path/to/images.jpg')
 my_img.contour() 
 my_img.save_img()
 ```
