@@ -1,6 +1,8 @@
 from pathlib import Path
-from matplotlib.image import imread, imsave
 
+import numpy as np
+from matplotlib.image import (imread, imsave)
+import cv2
 
 def rgb2gray(rgb):
     r, g, b = rgb[:, :, 0], rgb[:, :, 1], rgb[:, :, 2]
@@ -50,18 +52,81 @@ class Img:
 
             self.data[i] = res
 
-    def rotate(self):
-        # TODO remove the `raise` below, and write your implementation
-        raise NotImplementedError()
+    def rotate(self,angle):
+        if not isinstance(angle, int):
+            raise ValueError("Rotation angle must be an integer number of degrees.")
+        image = np.array(self.data)
+        rows, cols = image.shape
+        M = cv2.getRotationMatrix2D((cols / 2, rows / 2), angle, 1)  # Rotation center and scale
+        rotated_image = cv2.warpAffine(image, M, (cols, rows))
+        self.data = rotated_image.tolist()
 
-    def salt_n_pepper(self):
         # TODO remove the `raise` below, and write your implementation
-        raise NotImplementedError()
+        # raise NotImplementedError()
+
+    def salt_n_pepper(self, noise_ratio=0.1):
+        if not 0 <= noise_ratio <= 1:
+            raise ValueError("Noise ratio must be between 0.0 and 1.0.")
+        height, width = len(self.data), len(self.data[0])
+        num_pixels = height * width
+        num_noise_pixels = int(noise_ratio * num_pixels)
+        noise_indices = np.random.choice(num_pixels, num_noise_pixels, replace=False)
+        for idx in noise_indices:
+            row = idx // width
+            col = idx % width
+        # TODO remove the `raise` below, and write your implementation
+        # raise NotImplementedError()
 
     def concat(self, other_img, direction='horizontal'):
+        if self.data[0][0] != other_img.data[0][0] or self.data[0][0] != 255:
+            raise ValueError("Images must have compatible grayscale intensity range (0-255).")
+
+            # Validate direction
+        if direction not in ('horizontal', 'vertical'):
+            raise ValueError("Direction must be 'horizontal' or 'vertical'.")
+
+            # Concatenation logic
+        if direction == 'horizontal':
+            # Ensure both images have the same height
+            if len(self.data) != len(other_img.data):
+                # Pad the shorter image with zeros to match the height of the longer image
+                height_diff = abs(len(self.data) - len(other_img.data))
+                padding_row = [0] * len(self.data[0])
+                if len(self.data) < len(other_img.data):
+                    self.data.extend([padding_row] * height_diff)
+                else:
+                    other_img.data.extend([padding_row] * height_diff)
+
+            # Concatenate image data by row
+            self.data = [row1 + row2 for row1, row2 in zip(self.data, other_img.data)]
+
+        else:  # direction == 'vertical'
+            # Ensure both images have the same width
+            if len(self.data[0]) != len(other_img.data[0]):
+                # Pad the narrower image with zeros to match the width of the wider image
+                width_diff = abs(len(self.data[0]) - len(other_img.data[0]))
+                padding_value = [0] * width_diff
+                if len(self.data[0]) < len(other_img.data[0]):
+                    for row in self.data:
+                        row.extend(padding_value)
+                else:
+                    for row in other_img.data:
+                        row.extend(padding_value)
+
+            # Concatenate image data by column
+            self.data = [[pixel for row in (col1, col2) for pixel in row] for col1, col2 in
+                         zip(*zip(self.data, other_img.data))]
+
+
+
         # TODO remove the `raise` below, and write your implementation
-        raise NotImplementedError()
+        # raise NotImplementedError()
 
     def segment(self):
         # TODO remove the `raise` below, and write your implementation
         raise NotImplementedError()
+
+
+
+
+    if my_img = Img()
