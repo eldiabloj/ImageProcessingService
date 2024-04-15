@@ -166,9 +166,9 @@ from PIL import Image
 import cv2
 import numpy as np
 
-class ImgProcessor:
-    def _init_(self, img_path):
-        self.image_path = img_path
+class Img:
+    def __init__(self,image_path):
+        self.image_path = image_path
         self.image_data = self.load_image()
 
     def load_image(self):
@@ -208,13 +208,15 @@ class ImgProcessor:
             print(f"Error applying blur: {e}")
             return None
 
+
     def rotate(self):
         try:
-            img = Image.open(self.image_path)
-            rotated_img = img.rotate(180)
-            rotated_img_np = np.array(rotated_img)
-            self.save_image(rotated_img_np, '_rotated')
-            return rotated_img_np
+            img = cv2.imread(self.image_path)
+            if img is None:
+                raise FileNotFoundError("Unable to load image.")
+            rotated_img = cv2.rotate(img, cv2.ROTATE_180)
+            self.save_image(rotated_img, '_rotated')
+            return rotated_img
         except Exception as e:
             print(f"Error rotating image: {e}")
             return None
@@ -233,17 +235,17 @@ class ImgProcessor:
             print(f"Error adding salt and pepper noise: {e}")
             return None
 
-    def concat(self, secend_image_data, direction='horizontal'):
+    def concat(self, other_image_data, direction='horizontal'):
         try:
-            if self.image_data is None or secend_image_data is None:
+            if self.image_data is None or other_image_data is None:
                 raise ValueError("Image data is missing.")
             if direction not in ['horizontal', 'vertical']:
                 raise ValueError("Invalid direction. Please use 'horizontal' or 'vertical'.")
 
             if direction == 'horizontal':
-                concatenated_img = np.concatenate((self.image_data, secend_image_data), axis=1)
+                concatenated_img = np.concatenate((self.image_data, other_image_data), axis=1)
             else:
-                concatenated_img = np.concatenate((self.image_data, secend_image_data), axis=0)
+                concatenated_img = np.concatenate((self.image_data, other_image_data), axis=0)
             self.save_image(concatenated_img, '_concat')
             return concatenated_img
         except Exception as e:
@@ -288,17 +290,13 @@ for key, value in filters.items():
 
 # Get user input for filter and image file name
 selected_filter = input("Enter the number of the filter you want to apply: ")
-image_file = input("Enter the name of the image file : ")
+image_file = input("Enter the name of the image file (e.g., tiger.jpg): ")
 
-# Get the path of the image file
-img_path = os.path.join('images', image_file)
+image_path = os.path.join('images', image_file)
 
-# Check if the selected filter exists
 if selected_filter in filters:
-    # Create an instance of ImgProcessor with the image path
-    img_processor = ImgProcessor(img_path)
+    img_processor = Img(image_path)
 
-    # Apply the selected filter
     if selected_filter == '1':
         img_processor.blur()
     elif selected_filter == '2':
