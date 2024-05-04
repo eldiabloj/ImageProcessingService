@@ -91,18 +91,28 @@ class Img:
             if self.image_data is None:
                 raise ValueError("No image data available.")
 
+            # Convert image to RGB color space
             image_rgb = cv2.cvtColor(self.image_data, cv2.COLOR_BGR2RGB)
-            pixels = image_rgb.reshape((-1, 3))
-            pixels = np.float32(pixels)
 
-            criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 100, 0.2)
+            # Reshape image data to 2D array of pixels
+            pixels = image_rgb.reshape((-1, 3)).astype(np.float32)
+
+            # Define criteria for k-means clustering
+            criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 10, 1.0)
+
+            # Perform k-means clustering
             _, labels, centers = cv2.kmeans(pixels, num_clusters, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
 
+            # Convert centers to 8-bit unsigned integer format
             centers = np.uint8(centers)
+
+            # Map each pixel to its corresponding cluster center
             segmented_image = centers[labels.flatten()]
+
+            # Reshape segmented image back to original shape
             segmented_image = segmented_image.reshape(image_rgb.shape)
 
-            # Convert segmented image back to BGR format
+            # Convert segmented image back to BGR color space
             segmented_image_bgr = cv2.cvtColor(segmented_image, cv2.COLOR_RGB2BGR)
 
             # Darken the segmented image
