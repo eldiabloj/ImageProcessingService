@@ -49,13 +49,13 @@ class Img:
             img = cv2.imread(self.image_path)
             if img is None:
                 raise FileNotFoundError("Unable to load image.")
-            rotated_img = cv2.rotate(img, cv2.ROTATE_180)
+            rotated_img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
             return rotated_img
         except Exception as e:
             print(f"Error rotating image: {e}")
             return None
 
-    def salt_n_pepper(self, amount=0.05):
+    def salt_n_pepper(self, amount=0.1):
         try:
             if self.image_data is None:
                 raise ValueError("No image data available.")

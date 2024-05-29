@@ -1,17 +1,27 @@
 import telebot
-# import os
 import cv2
 from polybot.img_proc import Img
+from dotenv import load_dotenv
+import os
 
-# Initialize your bot with your bot token
-bot = telebot.TeleBot("6648578545:AAFNnFkbsJZOZiRu6TenQ7ufwJedsB_OaEo")
+load_dotenv()
+TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
+
+# Check if TELEGRAM_TOKEN is not none
+if TELEGRAM_TOKEN is None:
+    print("Error: TELEGRAM_TOKEN is not set in the ..env file.")
+    exit(1)
+
+# initialize TELEGRAM_BOT
+bot = telebot.TeleBot(TELEGRAM_TOKEN)
+
 
 # Dictionary to store the images temporarily
 user_images = {}
 
 @bot.message_handler(commands=['start'])
 def handle_start(message):
-    bot.send_message(message.chat.id, "Hello! Send me an image then choose a filter from the following options:\n"
+    bot.send_message(message.chat.id, "Hi there! Send me an image then choose a filter from the following options:\n"
                                       "- Blur\n"
                                       "- Rotate\n"
                                       "- Salt and Pepper\n"
@@ -62,7 +72,7 @@ def handle_image(message):
                     print("Error concatenating images.")
                     bot.reply_to(message, "Error concatenating images.")
 
-                # Clear user state
+                # Clear user
                 del user_images[message.chat.id]
             else:
                 # This is the first image
@@ -70,10 +80,10 @@ def handle_image(message):
                 user_images[message.chat.id]['concat_pending'] = image_path
                 bot.reply_to(message, "First image saved successfully! Now please send the second image to concatenate with.")
         else:
-            # This is the first image
+            # This is the first image+ the choose filter op's
             print("This is the first image received")
             user_images[message.chat.id] = {'concat_pending': image_path}
-            bot.reply_to(message, "First image saved successfully! Now to applay concat filter please send another image or choose a filter from the list \n"
+            bot.reply_to(message, "First image saved successfully! Now to applay concat  filter please send another image or choose a filter from the list \n"
                                       "- Blur\n"
                                       "- Rotate\n"
                                       "- Salt and Pepper\n"
@@ -128,7 +138,7 @@ def handle_filter(message):
     except Exception as e:
         bot.reply_to(message, f"Error processing image: {e}")
 
-# Start your bot with polling
+# Start your bot with polling +running or not
 try:
     print("Bot is running...")
     bot.polling()
