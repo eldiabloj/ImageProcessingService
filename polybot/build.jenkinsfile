@@ -1,0 +1,15 @@
+pipeline {
+    agent any
+    stages {
+        stage('Build') {
+            steps {
+                sh '''
+                docker login github_jenkins
+		         docker build -t polybot/Dockerfilel
+		         docker push
+
+                '''
+            }
+        }
+    }
+}
