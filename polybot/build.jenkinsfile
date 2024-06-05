@@ -1,26 +1,46 @@
-pipeline {
+// pipeline {
+//     agent any
+//
+//     enevironment {
+//         img_name= "polybot:${BUILD_NUMER}"
+//     }
+//
+//     stages {
+//         stage('Build docker image') {
+//             steps {
+//             withCredentials([usernamePassword(credentialsId: 'git jenkins', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]
+//             ) {
+//                 bat '''
+//                 cd polybot
+//
+//                 docker login -u USERNAME -p USERPASS
+// 		         docker build -t / img_name
+// 		         docker tag eldiabloj/ img_name
+// 		         docker push eldiabloj/ img_name
+//
+//
+//                 '''
+//             }
+//         }
+//     }
+// }
+ pipeline {
     agent any
-
-    enevironment {
-        img_name= "polybot:${BUILD_NUMER}"
+    environment {
+        IMG_NAME = "polybot:${BUILD_NUMBER}"
     }
-
     stages {
         stage('Build docker image') {
             steps {
-            withCredentials(
-               [usernamePassword(credentialsId: 'git jenkins', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]
-            ) {
-                bat '''
-                cd polybot
-
-                docker login -u USERNAME -p USERPASS
-		         docker build -t / img_name
-		         docker tag eldiabloj/ img_name
-		         docker push eldiabloj/ img_name
-
-
-                '''
+                withCredentials([usernamePassword(credentialsId: 'git jenkins', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                    bat """
+                        cd polybot
+                        docker login -u ${USER} -p ${PASS}
+                        docker build -t ${IMG_NAME} .
+                        docker tag ${IMG_NAME} ofriz/${IMG_NAME}
+                        docker push ofriz/${IMG_NAME}
+                    """
+                }
             }
         }
     }
