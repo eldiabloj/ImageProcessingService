@@ -19,6 +19,7 @@ pipeline {
 		         docker tag eldiabloj/ img_name
 		         docker push eldiabloj/ img_name
 
+
                 '''
             }
         }
