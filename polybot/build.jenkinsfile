@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     enevirontment {
-        img_name=polybot:${BUILD_NUMER}
+        img_name= "polybot":${BUILD_NUMER}
     }
 
     stages {
@@ -14,7 +14,7 @@ pipeline {
                 sh '''
                 cd polybot
 
-                docker login github_jenkins
+                docker login -u USERNAME -p USERPASS
 		         docker build -t / img_name
 		         docker tag eldiabloj/ img_name
 		         docker push eldiabloj/ img_name
