@@ -11,7 +11,7 @@ pipeline {
             withCredentials(
                  [usernamePassword(credentialsId: 'git jenkins', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]
               ) {
-                sh '''
+                bash '''
                 cd polybot
 
                 docker login -u USERNAME -p USERPASS
