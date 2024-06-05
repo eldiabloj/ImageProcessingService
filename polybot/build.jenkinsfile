@@ -9,7 +9,7 @@ pipeline {
         stage('Build') {
             steps {
             withCredentials(
-                 [usernamePassword(credentialsId: 'git jenkins', usernameVariable: 'USERPASS', passwordVariable: 'USERPASS')]
+                 [usernamePassword(credentialsId: 'git jenkins', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]
               ) {
                 sh '''
                 cd polybot
