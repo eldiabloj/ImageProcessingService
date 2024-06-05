@@ -1,16 +1,16 @@
 pipeline {
     agent any
 
-    enevirontment {
+    enevironment {
         img_name= "polybot:${BUILD_NUMER}"
     }
 
     stages {
-        stage('Build') {
+        stage('Build docker image') {
             steps {
             withCredentials(
-                 [usernamePassword(credentialsId: 'git jenkins', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]
-              ) {
+               [usernamePassword(credentialsId: 'git jenkins', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]
+            ) {
                 bat '''
                 cd polybot
 
