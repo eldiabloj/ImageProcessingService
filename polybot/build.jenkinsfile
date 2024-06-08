@@ -1,4 +1,4 @@
- pipeline {
+pipeline {
     agent any
     environment {
         IMG_NAME = "polybot:${BUILD_NUMBER}"
@@ -9,7 +9,6 @@
                 withCredentials([usernamePassword(credentialsId: 'git jenkins', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
                     bat '''
                     cd polybot
-
                     docker login -u %USERNAME% -p %USERPASS%
                     docker build -t %IMG_NAME% .
                     docker tag %IMG_NAME% eldiabloj/%IMG_NAME%
