@@ -7,17 +7,49 @@ pipeline {
         stage('Build docker image') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'git jenkins', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
-                    bat '''
-                    cd polybot
-                    docker login -u %USERNAME% -p %USERPASS%
-                    docker build -t %IMG_NAME% .
-                    docker tag %IMG_NAME% eldiabloj/%IMG_NAME%
-                    docker push eldiabloj/%IMG_NAME%
-                    '''
+                    script {
+                        try {
+                            bat '''
+                            cd polybot
+                            docker login -u %USERNAME% -p %USERPASS%
+                            docker build -t %IMG_NAME% .
+                            '''
+                        } catch (Exception e) {
+                            echo "Docker build failed"
+                            error "Build failed: ${e.message}"
+                        }
+                        bat '''
+                        docker tag %IMG_NAME% eldiabloj/%IMG_NAME%
+                        docker push eldiabloj/%IMG_NAME%
+                        '''
+                    }
                 }
             }
         }
     }
+}
+
+// vri1
+// pipeline {
+//     agent any
+//     environment {
+//         IMG_NAME = "polybot:${BUILD_NUMBER}"
+//     }
+//     stages {
+//         stage('Build docker image') {
+//             steps {
+//                 withCredentials([usernamePassword(credentialsId: 'git jenkins', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
+//                     bat '''
+//                     cd polybot
+//                     docker login -u %USERNAME% -p %USERPASS%
+//                     docker build -t %IMG_NAME% .
+//                     docker tag %IMG_NAME% eldiabloj/%IMG_NAME%
+//                     docker push eldiabloj/%IMG_NAME%
+//                     '''
+//                 }
+//             }
+//         }
+//     }
 
 
 // pipeline {
