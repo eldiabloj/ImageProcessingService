@@ -28,7 +28,6 @@ pipeline {
         }
     }
 }
-
 // vri1
 // pipeline {
 //     agent any
