@@ -1,0 +1,36 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('deploy.jenkinsfile') {
+            steps {
+                bat '''
+              echo "deploying to k8s cluster ..( or any other alternative)"
+                '''
+
+
+            }
+        }
+    }
+}
+pipeline {
+    agent ..
+
+    # add the below line in the same level an `agent` and `stages`:
+    parameters { string(name: 'eldiabloj/polybot:${BUILD_NUMBER}', defaultValue: '', description: 'deploy polybot') }
+
+    stages ...
+}
+
+//pipeline {
+//   agent any
+
+//    stages {
+//        stage('Deploy') {
+//            steps {
+                // complete this code to deploy to real k8s cluster
+
+//            }
+//      }
+//    }
+//}

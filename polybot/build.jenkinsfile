@@ -28,6 +28,18 @@ pipeline {
         }
     }
 }
+
+stage('Trigger Deploy') {
+    steps {
+        build job: 'deploy_polybot', wait: false, parameters: [
+            string(name: 'eldiabloj/polybot:${BUILD_NUMBER}', value: "polybot:${BUILD_NUMBER}")
+        ]
+    }
+}
+
+
+
+
 // vri1
 // pipeline {
 //     agent any
