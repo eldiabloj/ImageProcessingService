@@ -6,7 +6,7 @@ pipeline {
     stages {
         stage('Build docker image') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'git jenkins', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
+                withCredentials([usernamePassword(credentialsId: 'jenkins.docker', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
                     script {
                         try {
                             bat '''
