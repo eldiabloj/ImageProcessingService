@@ -16,10 +16,9 @@ pipeline {
 pipeline {
     agent ..
 
-    # add the below line in the same level an `agent` and `stages`:
-    parameters { string(name: 'eldiabloj/polybot:${BUILD_NUMBER}', defaultValue: '', description: 'deploy polybot') }
 
-    stages ...
+    parameters { string(name: 'eldiabloj/polybot:${BUILD_NUMBER}', defaultValue: '', description: 'deploy polybot') }
+   }
 }
 
 //pipeline {

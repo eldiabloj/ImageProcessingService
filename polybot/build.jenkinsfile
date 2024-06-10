@@ -32,7 +32,7 @@ pipeline {
 stage('Trigger Deploy') {
     steps {
         build job: 'deploy_polybot', wait: false, parameters: [
-            string(name: 'eldiabloj/polybot:${BUILD_NUMBER}', value: "polybot:${BUILD_NUMBER}")
+            string(name: 'eldiabloj/polybot:${BUILD_NUMBER}', value: "polybot")
         ]
     }
 }
