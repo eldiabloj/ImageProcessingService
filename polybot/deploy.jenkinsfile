@@ -18,7 +18,7 @@ pipeline {
 
 
     parameters { string(name: 'eldiabloj/polybot:${BUILD_NUMBER}', defaultValue: '', description: 'deploy polybot') }
-   }
+
 }
 
 //pipeline {

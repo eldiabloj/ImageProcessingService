@@ -26,22 +26,20 @@ pipeline {
                 }
             }
         }
+
+        stage('Trigger Deploy') {
+            steps {
+                script {
+                    build job: 'deploy_polybot', wait: false, parameters: [
+                        string(name: 'IMAGE_NAME', value: "eldiabloj/polybot:${BUILD_NUMBER}")
+                    ]
+                }
+            }
+        }
     }
 }
 
-stage('Trigger Deploy') {
-    steps {
-        build job: 'deploy_polybot', wait: false, parameters: [
-            string(name: 'eldiabloj/polybot:${BUILD_NUMBER}', value: "polybot")
-        ]
-    }
-}
-
-
-
-
-
-// vri1
+// vir 1
 // pipeline {
 //     agent any
 //     environment {
@@ -50,38 +48,38 @@ stage('Trigger Deploy') {
 //     stages {
 //         stage('Build docker image') {
 //             steps {
-//                 withCredentials([usernamePassword(credentialsId: 'git jenkins', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
-//                     bat '''
-//                     cd polybot
-//                     docker login -u %USERNAME% -p %USERPASS%
-//                     docker build -t %IMG_NAME% .
-//                     docker tag %IMG_NAME% eldiabloj/%IMG_NAME%
-//                     docker push eldiabloj/%IMG_NAME%
-//                     '''
-//                 }
-//             }
-//         }
-//     }
-
-
-// pipeline {
-//     agent any
-//     environment {
-//         IMG_NAME = "polybot:${BUILD_NUMBER}"
-//     }
-//     stages {
-//         stage('Build docker image') {
-//             steps {
-//                 withCredentials([usernamePassword(credentialsId: 'git jenkins', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-//                     bat """
-//                         cd polybot
-//                         docker login -u ${USER} -p ${PASS}
-//                         docker build -t ${IMG_NAME} .
-//                         docker tag ${IMG_NAME} ofriz/${IMG_NAME}
-//                         docker push ofriz/${IMG_NAME}
-//                     """
+//                 withCredentials([usernamePassword(credentialsId: 'jenkins.docker', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
+//                     script {
+//                         try {
+//                             bat '''
+//                             cd polybot
+//                             docker login -u %USERNAME% -p %USERPASS%
+//                             docker build -t %IMG_NAME% .
+//                             '''
+//                         } catch (Exception e) {
+//                             echo "Docker build failed"
+//                             error "Build failed: ${e.message}"
+//                         }
+//                         bat '''
+//                         docker tag %IMG_NAME% eldiabloj/%IMG_NAME%
+//                         docker push eldiabloj/%IMG_NAME%
+//                         '''
+//                     }
 //                 }
 //             }
 //         }
 //     }
 // }
+//
+// stage('Trigger Deploy') {
+//     steps {
+//         build job: 'deploy_polybot', wait: false, parameters: [
+//             string(name: 'eldiabloj/polybot:${BUILD_NUMBER}', value: "polybot")
+//         ]
+//     }
+// }
+//
+//
+
+
+
