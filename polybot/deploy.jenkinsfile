@@ -1,7 +1,7 @@
 pipeline {
     agent any
     parameters {
-        string(name: 'IMAGE_TAG', defaultValue: '', description: 'The tag of the Docker image to deploy, e.g., eldiabloj/polybot:42')
+        string(name: 'IMAGE_TAG', defaultValue: '', description: 'eldiabloj/polybot:47')
     }
     stages {
         stage('Deploy to Kubernetes') {
