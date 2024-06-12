@@ -4,7 +4,7 @@ pipeline {
         string(name: 'IMAGE_TAG', defaultValue: '', description: 'eldiabloj/polybot:47')
     }
     stages {
-        stage('Deploy to Kubernetes') {
+        stage('deploy.jenkinsfile') {
             steps {
                 script {
                     bat '''
