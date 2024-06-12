@@ -42,7 +42,6 @@ pipeline {
 
 
 
-
 // vir 2
 // pipeline {
 //     agent any
