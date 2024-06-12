@@ -11,6 +11,7 @@ pipeline {
                     echo "Deploying to Kubernetes cluster..."
                     echo "Using Docker image: ${IMAGE_TAG}"
                     echo "kubectl set image deployment/polybot polybot=${IMAGE_TAG}"
+                    echo i deed it
                     '''
                 }
             }
