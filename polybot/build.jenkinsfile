@@ -31,7 +31,7 @@ pipeline {
             steps {
                 script {
                     build job: 'deploy_polybot', wait: false, parameters: [
-                        string(name: 'IMAGE_TAG', value: "eldiabloj/polybot:${BUILD_NUMBER}")
+                        string(name: 'IMAGE_NAME', value: "eldiabloj/polybot:${BUILD_NUMBER}")
                     ]
                 }
             }
@@ -44,7 +44,7 @@ pipeline {
 //                 script {
 //                     Triggering the deployment job and passing the image tag as a parameter
 //                     build job: 'deploy_polybot', wait: false, parameters: [
-//                         string(name: 'IMAGE_NAME', value: "eldiabloj/polybot:${BUILD_NUMBER}")
+//                         string(name: 'IMAGE_TAG', value: "eldiabloj/polybot:${BUILD_NUMBER}")
 //                     ]
 //                 }
 //             }

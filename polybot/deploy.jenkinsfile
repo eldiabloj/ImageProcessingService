@@ -7,6 +7,7 @@ pipeline {
         stage('deploy.jenkinsfile') {
             steps {
                 bat '''
+                cd polybot
               echo "deploying to k8s cluster ..( or any other alternative)"
                 '''
 
