@@ -10,11 +10,6 @@ pipeline {
                     bat '''
                     echo "Deploying to Kubernetes cluster..."
                     echo "Using Docker image: ${IMAGE_TAG}"
-
-                    # Add your deployment commands here, for example:
-                    # kubectl set image deployment/polybot polybot=${IMAGE_TAG}
-
-                    # For demonstration, we just print the command
                     echo "kubectl set image deployment/polybot polybot=${IMAGE_TAG}"
                     '''
                 }
