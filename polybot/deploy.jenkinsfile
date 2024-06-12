@@ -1,31 +1,51 @@
 pipeline {
     agent any
-        parameters {
-         string(name: 'eldiabloj/polybot:${BUILD_NUMBER}', defaultValue: '', description: 'deploy polybot')
+    parameters {
+        string(name: 'IMAGE_TAG', defaultValue: '', description: 'The tag of the Docker image to deploy, e.g., eldiabloj/polybot:42')
     }
     stages {
-        stage('deploy.jenkinsfile') {
+        stage('Deploy to Kubernetes') {
             steps {
-                bat '''
-                cd polybot
-              echo "deploying to k8s cluster ..( or any other alternative)"
-                '''
-
-
+                script {
+                    bat '''
+                    echo "Deploying to Kubernetes cluster..."
+                    echo "Using Docker image: ${IMAGE_TAG}"
+                    echo "kubectl set image deployment/polybot polybot=${IMAGE_TAG}"
+                    '''
+                }
             }
         }
     }
 }
 
 
+
+// vir 1
 // pipeline {
-//     agent ..
+//     agent any
+//         parameters {
+//          string(name: 'eldiabloj/polybot:${BUILD_NUMBER}', defaultValue: '', description: 'deploy_polybot')
+//     }
+//     stages {
+//         stage('deploy.jenkinsfile') {
+//             steps {
+//                 bat '''
+//                 cd polybot
+//               echo "deploying to k8s cluster ..( or any other alternative)"
+//                 '''
+//
+//
+//             }
+//         }
+//     }
+// }
 
 
 
 
 
 
+// base///
 //pipeline {
 //   agent any
 
