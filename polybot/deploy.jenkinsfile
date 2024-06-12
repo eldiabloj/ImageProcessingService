@@ -1,6 +1,8 @@
 pipeline {
     agent any
-        parameters { string(name: 'eldiabloj/polybot:${BUILD_NUMBER}', defaultValue: '', description: 'deploy polybot') }
+        parameters {
+         string(name: 'eldiabloj/polybot:${BUILD_NUMBER}', defaultValue: '', description: 'deploy polybot')
+    }
     stages {
         stage('deploy.jenkinsfile') {
             steps {
@@ -13,13 +15,15 @@ pipeline {
         }
     }
 }
-pipeline {
-    agent ..
+
+
+// pipeline {
+//     agent ..
 
 
 
 
-}
+
 
 //pipeline {
 //   agent any
