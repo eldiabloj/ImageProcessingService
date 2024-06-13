@@ -14,6 +14,7 @@ COPY . .
 # Expose the port that the app runs on
 EXPOSE 8081
 
+
 # Define the command to run the application
 CMD ["python3", "bot.py"]
 
