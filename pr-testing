@@ -1,3 +1,4 @@
+
 pipeline {
     agent any
 
@@ -9,7 +10,7 @@ pipeline {
         }
         stage('Lint') {
             steps {
-                sh 'echo "linting"'
+                cd polybot "'
             }
         }
         stage('Functional test') {
@@ -19,4 +20,3 @@ pipeline {
         }
     }
 }
-x+5
