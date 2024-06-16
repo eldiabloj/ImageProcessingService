@@ -2,7 +2,7 @@ FROM python:3.10.12-slim-bullseye
 
 WORKDIR /app
 
-# Copy only the requirements file to leverage Docker cache
+# Copy only the requirements file to leverage Dockercompose cache
 COPY requirements.txt .
 
 # Install dependencies
