@@ -4,17 +4,17 @@ pipeline {
     stages {
         stage('Unittest') {
             steps {
-                sh 'echo "testing"'
+                bat 'echo "testing"'
             }
         }
         stage('Lint') {
             steps {
-                sh 'echo "linting"'
+                bat 'echo "linting"'
             }
         }
         stage('Functional test') {
             steps {
-                sh 'echo "testing"'
+                bat 'echo "testing"'
             }
         }
     }
