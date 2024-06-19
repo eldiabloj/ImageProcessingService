@@ -3,7 +3,8 @@ pipeline {
     docker {
         image '<image-url>'
         args  '--user root -v /var/run/docker.sock:/var/run/docker.sock'
-
+    }
+    }
     parameters {
         string(name: 'IMAGE_TAG', defaultValue: '', description: 'eldiabloj/polybot:50')
     }
@@ -22,3 +23,4 @@ pipeline {
         }
     }
 }
+
