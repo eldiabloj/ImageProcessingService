@@ -3,7 +3,8 @@ pipeline {
     docker {
         image '<image-url>'
         args  '--user root -v /var/run/docker.sock:/var/run/docker.sock'
-
+    }
+    }
     environment {
         IMG_NAME = "polybot:${BUILD_NUMBER}"
     }
