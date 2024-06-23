@@ -1,12 +1,13 @@
 pipeline {
-     agent {
-    docker {
-        image 'eldiabloj/dockerfile_agent:latest'
-        args  '--user root -v /var/run/docker.sock:/var/run/docker.sock'
-    }
+    agent {
+        docker {
+            image 'eldiabloj/dockerfile_agent'
+            args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
+        }
     }
     environment {
         IMG_NAME = "polybot:${BUILD_NUMBER}"
+        DOCKER_REGISTRY = "eldiabloj"  // Adjust this based on your Docker registry URL
     }
     stages {
         stage('Build Docker Image') {
@@ -14,28 +15,36 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'jenkins.docker', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
                     script {
                         try {
-                            bat '''
-                            cd polybot
-                            docker login -u %USERNAME% -p %USERPASS%
-                            docker build -t %IMG_NAME% .
-                            '''
+                            // Change directory to where Dockerfile is located
+                            dir('polybot') {
+                                // Login to Docker registry
+                                bat "docker login -u ${USERNAME} -p ${USERPASS}"
+                                // Build Docker image
+                                bat "docker build -t ${IMG_NAME} ."
+                            }
                         } catch (Exception e) {
                             echo "Docker build failed"
                             error "Build failed: ${e.message}"
                         }
-                        bat '''
-                        docker tag %IMG_NAME% eldiabloj/%IMG_NAME%
-                        docker push eldiabloj/%IMG_NAME%
-                        '''
                     }
+                }
+            }
+        }
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    // Tag and push Docker image to registry
+                    bat "docker tag ${IMG_NAME} ${DOCKER_REGISTRY}/${IMG_NAME}"
+                    bat "docker push ${DOCKER_REGISTRY}/${IMG_NAME}"
                 }
             }
         }
         stage('Trigger Deploy') {
             steps {
                 script {
+                    // Trigger deployment job with the newly built image tag
                     build job: 'deploy_polybot', wait: false, parameters: [
-                        string(name: 'IMAGE_TAG', value: "eldiabloj/polybot:${BUILD_NUMBER}")
+                        string(name: 'IMAGE_TAG', value: "${DOCKER_REGISTRY}/${IMG_NAME}")
                     ]
                 }
             }
@@ -43,6 +52,51 @@ pipeline {
     }
 }
 
+
+//pipeline {
+//   agent {
+//   docker {
+//        image 'eldiabloj/dockerfile_agent:latest'
+//        args  '--user osherbg -v /var/run/docker.sock:/var/run/docker.sock'
+//    }
+//   }
+//    environment {
+//        IMG_NAME = "polybot:${BUILD_NUMBER}"
+//    }
+//    stages {
+//        stage('Build Docker Image') {
+//            steps {
+//                withCredentials([usernamePassword(credentialsId: 'jenkins.docker', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
+//                    script {
+//                       try {
+//                            bat '''
+//                            cd polybot
+//                            docker login -u %USERNAME% -p %USERPASS%
+//                            docker build -t %IMG_NAME% .
+//                            '''
+//                        } catch (Exception e) {
+//                            echo "Docker build failed"
+//                            error "Build failed: ${e.message}"
+//                        }
+//                        bat '''
+//                        docker tag %IMG_NAME% eldiabloj/%IMG_NAME%
+//                        docker push eldiabloj/%IMG_NAME%
+//                        '''
+//                    }
+//                }
+//            }
+//        }
+//        stage('Trigger Deploy') {
+//            steps {
+//                script {
+//                    build job: 'deploy_polybot', wait: false, parameters: [
+//                        string(name: 'IMAGE_TAG', value: "eldiabloj/polybot:${BUILD_NUMBER}")
+//                    ]
+//                }
+//            }
+//        }
+//    }
+//}
 
 
 
