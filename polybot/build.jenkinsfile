@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'eldiabloj/dockerfile_agent'
-            args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
-        }
-    }
+    agent any
     environment {
         IMG_NAME = "polybot:${BUILD_NUMBER}"
         DOCKER_REGISTRY = "eldiabloj"  // Adjust this based on your Docker registry URL
