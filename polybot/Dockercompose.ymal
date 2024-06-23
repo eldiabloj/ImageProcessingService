@@ -12,7 +12,7 @@ services:
 
   web:
     build:
-      context: ./web
-      dockerfile: Dockerfile nginx
+      context: .
+      dockerfile: Dockerfile.Nginx
     ports:
       - "80:80"
