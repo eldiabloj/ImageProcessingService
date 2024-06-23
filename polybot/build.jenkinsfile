@@ -1,5 +1,5 @@
 pipeline {
-    agent ... {
+    agent any {
     environment {
         IMG_NAME = "polybot:${BUILD_NUMBER}"
         DOCKER_REGISTRY = "eldiabloj"  // Adjust this based on your Docker registry URL
