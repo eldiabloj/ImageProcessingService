@@ -36,8 +36,8 @@ pipeline {
             steps {
                 script {
                     // Tag and push Docker image to registry
-                    bat "docker tag $ {IMG_NAME} $ {eldiabloj/polybot}"
-                    bat "docker push $ {eldiabloj/polybot"}
+                    bat "docker tag ${IMG_NAME} ${DOCKER_REGISTRY}
+                    bat "docker push ${eldiabloj/polybot"}
                 }
             }
         }
@@ -57,7 +57,8 @@ pipeline {
 
 
 
-// biuld vir2
+
+//  biuld vir2
 //  pipeline {
 //      agent any
 //      environment {
