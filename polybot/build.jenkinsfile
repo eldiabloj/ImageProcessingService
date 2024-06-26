@@ -1,9 +1,14 @@
- pipeline {
-     agent any
-     environment {
+pipeline {
+    agent any
+
+    environment {
         IMG_NAME = "polybot:${BUILD_NUMBER}"
-        DOCKER_REGISTRY = "eldiabloj"  // Adjust this based on your Docker registry URL
     }
+
+    parameters {
+        string(name: 'IMAGE_TAG', defaultValue: '', description: 'eldiabloj/polybot:latest')
+    }
+
     stages {
         stage('Build Docker Image') {
             steps {
@@ -25,6 +30,7 @@
                 }
             }
         }
+
         stage('Push Docker Image') {
             steps {
                 script {
@@ -34,13 +40,13 @@
                 }
             }
         }
-        stage('Trigger Deploy') {
+
+        stage('Deploy polybot') {
             steps {
                 script {
-                    // Trigger deployment job with the newly built image tag
-                    build job: 'deploy_polybot', wait: false, parameters: [
-                        string(name: 'IMAGE_TAG', value: "${DOCKER_REGISTRY}/${IMG_NAME}")
-                    ]
+                    echo "Deploying to Kubernetes cluster..."
+                    echo "Using Docker image: ${params.IMAGE_TAG}"
+                    echo "kubectl set image deployment/polybot polybot=${params.IMAGE_TAG}"
                 }
             }
         }
@@ -48,11 +54,85 @@
 }
 
 
-//pipeline {
+
+// biuld vir2
+//  pipeline {
+//      agent any
+//      environment {
+//         IMG_NAME = "polybot:${BUILD_NUMBER}"
+//         DOCKER_REGISTRY = "eldiabloj"  // Adjust this based on your Docker registry URL
+//     }
+//     stages {
+//         stage('Build Docker Image') {
+//             steps {
+//                 withCredentials([usernamePassword(credentialsId: 'jenkins.docker', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
+//                     script {
+//                         try {
+//                             Change directory to where Dockerfile is located
+//                             dir('polybot') {
+//                                 Login to Docker registry
+//                                 bat "docker login -u ${USERNAME} -p ${USERPASS}"
+//                                 Build Docker image
+//                                 bat "docker build -t ${IMG_NAME} ."
+//                             }
+//                         } catch (Exception e) {
+//                             echo "Docker build failed"
+//                             error "Build failed: ${e.message}"
+//                         }
+//                     }
+//                 }
+//             }
+//         }
+//         stage('Push Docker Image') {
+//             steps {
+//                 script {
+//                     Tag and push Docker image to registry
+//                     bat "docker tag ${IMG_NAME} ${DOCKER_REGISTRY}/${IMG_NAME}"
+//                     bat "docker push ${DOCKER_REGISTRY}/${IMG_NAME}"
+//                 }
+//             }
+//         }
+//         stage('Trigger Deploy') {
+//             steps {
+//                 script {
+//                     Trigger deployment job with the newly built image tag
+//                     build job: 'deploy_polybot', wait: false, parameters: [
+//                         string(name: 'IMAGE_TAG', value: "${DOCKER_REGISTRY}/${IMG_NAME}")
+//                     ]
+//                 }
+//             }
+//         }
+//     } //stages
+
+// }
+// deploy v1
+// pipeline {
+//   agent any
+//     parameters {
+//         string(name: 'IMAGE_TAG', defaultValue: '', description: 'eldiabloj/polybot:50')
+//     }
+//     stages {
+//         stage('deploy.jenkinsfile') {
+//             steps {
+//                 script {
+//                     bat '''
+//                     echo "Deploying to Kubernetes cluster..."
+//                     echo "Using Docker image: ${IMAGE_TAG}"
+//                     echo "kubectl set image deployment/polybot polybot=${IMAGE_TAG}"
+//                     echo i deed it
+//                     '''
+//                 }
+//             }
+//         }
+//     }
+// }
+//
+//
+// pipeline {
 //   agent {
 //   docker {
 //        image 'eldiabloj/dockerfile_agent:latest'
-//        args  '--user osherbg -v /var/run/docker.sock:/var/run/docker.sock'
+//        args  '-v "//var/run/docker.sock:/var/run/docker.sock'
 //    }
 //   }
 //    environment {
