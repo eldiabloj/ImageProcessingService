@@ -36,8 +36,8 @@ pipeline {
             steps {
                 script {
                     // Tag and push Docker image to registry
-                    bat "docker tag ${IMG_NAME} ${DOCKER_REGISTRY}
-                    bat "docker push ${DOCKER_REGISTRY}
+                    bat "docker tag ${IMG_NAME} ${DOCKER_REGISTRY}"
+                    bat "docker push ${DOCKER_REGISTRY}"
                 }
             }
         }
