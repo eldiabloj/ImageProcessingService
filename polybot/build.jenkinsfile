@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         IMG_NAME = "polybot:${BUILD_NUMBER}"
+        DOCKER_REGISTRY = "eldiabloj/%IMG_NAME%"
     }
 
     parameters {
@@ -35,8 +36,8 @@ pipeline {
             steps {
                 script {
                     // Tag and push Docker image to registry
-                    bat "docker tag ${IMG_NAME} ${DOCKER_REGISTRY}/${IMG_NAME}"
-                    bat "docker push ${DOCKER_REGISTRY}/${IMG_NAME}"
+                    bat "docker tag $ {IMG_NAME} $ eldiabloj/%IMG_NAME%"
+                    bat "docker push $ eldiabloj/%IMG_NAME%"
                 }
             }
         }
