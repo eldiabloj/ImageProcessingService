@@ -13,7 +13,7 @@ pipeline {
     stages {
         stage('Build Docker Image') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'jenkins.docker', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
+                withCredentials([usernamePassword(credentialsId: 'docker-jenkinse', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
                     script {
                         try {
                             // Change directory to where Dockerfile is located
