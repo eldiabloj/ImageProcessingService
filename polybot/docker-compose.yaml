@@ -6,16 +6,16 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8081:8081"  # host_port:container_port
-    volumes:
-      - ./:/app
+      - "8081:8081"
+    #volumes:
+     # - ./:/app
 
   web:
     build:
       context: .
       dockerfile: Dockerfile.Nginx
     ports:
-      - "80:80"  # host_port:container_port
+      - "80:80"
 
 
 #API_TOKEN = 'YOUR_BOT_API_TOKEN'

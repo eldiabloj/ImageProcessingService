@@ -1,4 +1,12 @@
-FROM python:3.10.12-slim-bullseye
+# Use Python 3.10 as the base image
+FROM python:3.10
+
+# Install necessary system dependencies including OpenGL libraries
+RUN apt-get update && \
+    apt-get install -y \
+        libgl1-mesa-glx \
+        libgl1-mesa-dev \
+        && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
