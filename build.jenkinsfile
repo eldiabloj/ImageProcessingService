@@ -52,8 +52,8 @@ pipeline {
             }
         }
     }
-}
-post {
+
+    post {
         always {
             // Clean up old containers but not the new one
             script {
@@ -75,6 +75,7 @@ post {
                 sh """
                     docker images --format '{{.Repository}}:{{.Tag}} {{.ID}}' | grep '${DOCKER_REPO}' | grep -v ':latest' | grep -v ':${BUILD_NUMBER}' | awk '{print \$2}' | xargs --no-run-if-empty docker rmi -f || true
                 """
+
             }
 
             // Clean build artifacts from Jenkins server
