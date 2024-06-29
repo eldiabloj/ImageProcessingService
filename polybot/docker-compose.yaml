@@ -6,8 +6,8 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8081"
-    volumes: 
+      - "8081:8081"  # host_port:container_port
+    volumes:
       - ./:/app
 
   web:
@@ -15,7 +15,8 @@ services:
       context: .
       dockerfile: Dockerfile.Nginx
     ports:
-      - "80:80"
+      - "80:80"  # host_port:container_port
+
 
 #API_TOKEN = 'YOUR_BOT_API_TOKEN'
 #WEBHOOK_HOST = 'your_host'
