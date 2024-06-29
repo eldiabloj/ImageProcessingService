@@ -36,8 +36,8 @@ pipeline {
             steps {
                 script {
                     // Tag and push Docker image to registry
-                    bat "docker tag ${IMG_NAME} ${DOCKER_REGISTRY}"
-                    bat "docker push ${DOCKER_REGISTRY}"
+                    bat "docker tag ${IMG_NAME} ${DOCKER_REGISTRY}:${BUILD_NUMBER}"
+                    bat "docker push ${DOCKER_REGISTRY}:${BUILD_NUMBER}"
                 }
             }
         }
@@ -47,7 +47,7 @@ pipeline {
                 script {
                     echo "Deploying to Kubernetes cluster..."
                     echo "Using Docker image: ${params.IMAGE_TAG}"
-                    echo "kubectl set image deployment/polybot polybot=${params.IMAGE_TAG}"
+                    bat "kubectl set image deployment/polybot polybot=${params.IMAGE_TAG}"
                 }
             }
         }
@@ -58,30 +58,116 @@ pipeline {
             // Clean up old containers but not the new one
             script {
                 // Fetch the container ID of the currently running container
-                def containerId = sh(script: "docker ps -q -f ancestor=${DOCKER_REPO}:${BUILD_NUMBER}", returnStdout: true).trim()
+                def containerId = bat(script: "docker ps -q -f ancestor=${DOCKER_REGISTRY}:${BUILD_NUMBER}", returnStdout: true).trim()
 
                 // Remove all stopped containers with the same image except the current one
-                sh """
-                    for id in \$(docker ps -a -q -f ancestor=${DOCKER_REPO}:${BUILD_NUMBER}); do
-                        if [ "\$id" != "${containerId}" ]; then
-                            docker rm -f \$id || true
-                        fi
-                    done
+                bat """
+                    docker ps -a -q -f ancestor=${DOCKER_REGISTRY}:${BUILD_NUMBER} | findstr /V "${containerId}" | for /F "tokens=*" %%i in ('more') do docker rm -f %%i
                 """
             }
 
             // Clean up old Docker images but keep the new one
             script {
-                sh """
-                    docker images --format '{{.Repository}}:{{.Tag}} {{.ID}}' | grep '${DOCKER_REPO}' | grep -v ':latest' | grep -v ':${BUILD_NUMBER}' | awk '{print \$2}' | xargs --no-run-if-empty docker rmi -f || true
+                bat """
+                    docker images -q ${DOCKER_REGISTRY}:${BUILD_NUMBER} | for /F "tokens=*" %%i in ('more') do docker rmi -f %%i
                 """
-
             }
 
-            // Clean build artifacts from Jenkins server
+            // Clean build artifacts from Jenkins workspace
             cleanWs()
         }
     }
+}
+
+
+
+
+
+// vir4
+// pipeline {
+//     agent any
+//
+//     environment {
+//         IMG_NAME = "polybot:${BUILD_NUMBER}"
+//         DOCKER_REGISTRY = "eldiabloj/polybot"
+//     }
+//
+//     parameters {
+//         string(name: 'IMAGE_TAG', defaultValue: '', description: 'eldiabloj/polybot:latest')
+//     }
+//
+//     stages {
+//         stage('Build Docker Image') {
+//             steps {
+//                 withCredentials([usernamePassword(credentialsId: 'docker-jenkinse', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
+//                     script {
+//                         try {
+//                             // Change directory to where Dockerfile is located
+//                             dir('polybot') {
+//                                 // Login to Docker registry
+//                                 bat "docker login -u ${USERNAME} -p ${USERPASS}"
+//                                 // Build Docker image
+//                                 bat "docker build -t ${IMG_NAME} ."
+//                             }
+//                         } catch (Exception e) {
+//                             echo "Docker build failed"
+//                             error "Build failed: ${e.message}"
+//                         }
+//                     }
+//                 }
+//             }
+//         }
+//
+//         stage('Push Docker Image') {
+//             steps {
+//                 script {
+//                     // Tag and push Docker image to registry
+//                     bat "docker tag ${IMG_NAME} ${DOCKER_REGISTRY}"
+//                     bat "docker push ${DOCKER_REGISTRY}"
+//                 }
+//             }
+//         }
+//
+//         stage('Deploy polybot') {
+//             steps {
+//                 script {
+//                     echo "Deploying to Kubernetes cluster..."
+//                     echo "Using Docker image: ${params.IMAGE_TAG}"
+//                     echo "kubectl set image deployment/polybot polybot=${params.IMAGE_TAG}"
+//                 }
+//             }
+//         }
+//     }
+//
+//     post {
+//         always {
+//             // Clean up old containers but not the new one
+//             script {
+//                 // Fetch the container ID of the currently running container
+//                 def containerId = sh(script: "docker ps -q -f ancestor=${DOCKER_REPO}:${BUILD_NUMBER}", returnStdout: true).trim()
+//
+//                 // Remove all stopped containers with the same image except the current one
+//                 sh """
+//                     for id in \$(docker ps -a -q -f ancestor=${DOCKER_REPO}:${BUILD_NUMBER}); do
+//                         if [ "\$id" != "${containerId}" ]; then
+//                             docker rm -f \$id || true
+//                         fi
+//                     done
+//                 """
+//             }
+//
+//             // Clean up old Docker images but keep the new one
+//             script {
+//                 sh """
+//                     docker images --format '{{.Repository}}:{{.Tag}} {{.ID}}' | grep '${DOCKER_REPO}' | grep -v ':latest' | grep -v ':${BUILD_NUMBER}' | awk '{print \$2}' | xargs --no-run-if-empty docker rmi -f || true
+//                 """
+//
+//             }
+//
+//             // Clean build artifacts from Jenkins server
+//             cleanWs()
+//         }
+//     }
 
 
 
