@@ -121,6 +121,11 @@ celerybeat.pid
 
 # Environments
 .env
+Dockerfile.agent
+minikube-linux-amd64
+minikube
+polybot/kubectl.sha256
+polybot/kubectl
 .venv
 env/
 venv/
