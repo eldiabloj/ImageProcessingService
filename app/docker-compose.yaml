@@ -7,13 +7,14 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8081:8081"
-    #volumes:
-     # - ./:/app
+    volumes:
+      - ./:/app
+
 
   web:
     build:
       context: .
-      dockerfile: Dockerfile.Nginx
+      dockerfile: dockerfile.nginx
     ports:
       - "80:80"
 
