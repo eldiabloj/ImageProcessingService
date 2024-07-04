@@ -89,6 +89,8 @@ CMD ["python", "-m", "polybot.bot"]
 ## Install dependencies
 #RUN pip install -r requirements.vir1
 
+
+
 ## Copy the rest of the application files
 #COPY . .
 
