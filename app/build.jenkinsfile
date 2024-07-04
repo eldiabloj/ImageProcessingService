@@ -55,9 +55,8 @@ pipeline {
         stage('Test') {
             steps {
                 script {
+                    def workspacePath = pwd()  // Get absolute workspace path
                     // Using DOCKER_REGISTRY instead of DOCKER_REPO
-                    script {
-            def workspacePath = pwd()  // Get absolute workspace path
                     //docker.image("${DOCKER_REGISTRY}:${BUILD_NUMBER}").inside {
                         sh '''
                         python3 -m venv venv
@@ -70,7 +69,6 @@ pipeline {
                 }
             }
         }
-    }
 
     post {
         always {
