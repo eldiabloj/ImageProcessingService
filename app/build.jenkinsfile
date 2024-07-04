@@ -52,10 +52,10 @@ pipeline {
             }
         }
 
-        stage('Test') {
+         stage('Test') {
             steps {
                 script {
-
+                    // Run linting and other tests inside a Docker container
                     docker.image("${DOCKER_REGISTRY}:${BUILD_NUMBER}").inside {
                         sh '''
                         python3 -m venv venv
@@ -68,6 +68,7 @@ pipeline {
                 }
             }
         }
+    }
 
     post {
         always {
