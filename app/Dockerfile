@@ -28,7 +28,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the application files to the working directory
 COPY . .
 # Copy the polybot source code into the container
-WORKDIR /app/polybot
+WORKDIR /app/polybot /app
 
 # Expose the port if needed
 EXPOSE 90:90
