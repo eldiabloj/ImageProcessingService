@@ -55,7 +55,7 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    docker.image("${DOCKER_REGISTRY}:${BUILD_NUMBER}").inside("-w DOCKER_REGISTRY") {
+                    docker.image("${DOCKER_REGISTRY}:${BUILD_NUMBER}").inside("-w /app") {
                         sh '''
                         python3 -m venv venv
                         . venv/bin/activate
