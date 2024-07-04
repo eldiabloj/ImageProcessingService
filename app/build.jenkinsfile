@@ -4,6 +4,7 @@ pipeline {
     environment {
         IMG_NAME = "polybot:${BUILD_NUMBER}"
         DOCKER_REGISTRY = "eldiabloj/polybot"
+        WORKSPACE_PATH = "/mnt/c/Users/oshrb/ImageProcessingService/app"
     }
 
     parameters {
@@ -55,7 +56,7 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    docker.image("${DOCKER_REGISTRY}:${BUILD_NUMBER}").inside {
+                    docker.image("${DOCKER_REGISTRY}:${BUILD_NUMBER}").inside
                         bat '''
                         python3 -m venv venv
                         . venv/bin/activate
