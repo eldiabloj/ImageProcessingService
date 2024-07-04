@@ -51,12 +51,12 @@ pipeline {
                 }
             }
         }
-    }
 
-    stage('Test') {
+        stage('Test') {
             steps {
                 script {
-                    docker.image("${DOCKER_REPO}:${BUILD_NUMBER}").inside {
+                    // Using DOCKER_REGISTRY instead of DOCKER_REPO
+                    docker.image("${DOCKER_REGISTRY}:${BUILD_NUMBER}").inside {
                         sh '''
                         python3 -m venv venv
                         . venv/bin/activate
@@ -107,6 +107,119 @@ pipeline {
         }
     }
 }
+
+
+
+
+// pipeline {
+//     agent any
+//
+//     environment {
+//         IMG_NAME = "polybot:${BUILD_NUMBER}"
+//         DOCKER_REGISTRY = "eldiabloj/polybot"
+//     }
+//
+//     parameters {
+//         string(name: 'IMAGE_TAG', defaultValue: '', description: 'eldiabloj/polybot:latest')
+//     }
+//
+//     stages {
+//         stage('Build Docker Image') {
+//             steps {
+//                 withCredentials([usernamePassword(credentialsId: 'docker-jenkinse', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
+//                     script {
+//                         try {
+//                             //Change directory to where Dockerfile is located
+//                             dir('app') {
+//                                 //Login to Docker registry
+//                                 bat "docker login -u ${USERNAME} -p ${USERPASS}"
+//                                 //Build Docker image
+//                                 bat "docker build -t ${IMG_NAME} ."
+//                             }
+//                         } catch (Exception e) {
+//                             echo "Docker build failed"
+//                             error "Build failed: ${e.message}"
+//                         }
+//                     }
+//                 }
+//             }
+//         }
+//
+//         stage('Push Docker Image') {
+//             steps {
+//                 script {
+//                     //Tag and push Docker image to registry
+//                     bat "docker tag ${IMG_NAME} ${DOCKER_REGISTRY}:${BUILD_NUMBER}"
+//                     bat "docker push ${DOCKER_REGISTRY}:${BUILD_NUMBER}"
+//                 }
+//             }
+//         }
+//
+//         stage('Deploy polybot') {
+//             steps {
+//                 script {
+//                     echo "Deploying to Kubernetes cluster..."
+//                     echo "Using Docker image: ${params.IMAGE_TAG}"
+//                     echo "kubectl set image deployment/polybot polybot=${params.IMAGE_TAG}"
+//                 }
+//             }
+//         }
+//     }
+//
+//     stage('Test') {
+//             steps {
+//                 script {
+//                     docker.image("${DOCKER_REPO}:${BUILD_NUMBER}").inside {
+//                         sh '''
+//                         python3 -m venv venv
+//                         . venv/bin/activate
+//                         pip install -r requirements.txt
+//                         pylint --disable=C0301,C0114,E1101,C0116,C0103,W0718,E0401,W0613,R1722,W0612,R0912,C0304,C0115,R1705 polybot/*.py
+//                         deactivate
+//                         '''
+//                     }
+//                 }
+//             }
+//         }
+//     }
+//
+//     post {
+//         always {
+//             // Clean up old containers but not the new one
+//             script {
+//                 try {
+//                     //Fetch the container ID of the currently running container
+//                     def containerId = bat(script: "docker ps -q -f ancestor=${DOCKER_REGISTRY}:${BUILD_NUMBER}", returnStdout: true).trim()
+//
+//                     if (containerId) {
+//                         //Remove all stopped containers with the same image except the current one
+//                         bat """
+//                             docker ps -a -q -f ancestor=${DOCKER_REGISTRY}:${BUILD_NUMBER} | findstr /V "${containerId}" | for /F "tokens=*" %%i in ('more') do docker rm -f %%i
+//                         """
+//                     } else {
+//                         echo "No old containers found to remove."
+//                     }
+//                 } catch (Exception e) {
+//                     echo "Error cleaning up old containers: ${e.message}"
+//                 }
+//             }
+//
+//             //Clean up old Docker images but keep the new one
+//             script {
+//                 try {
+//                     bat """
+//                         docker images -q ${DOCKER_REGISTRY}:${BUILD_NUMBER} | for /F "tokens=*" %%i in ('more') do docker rmi -f %%i
+//                     """
+//                 } catch (Exception e) {
+//                     echo "Error cleaning up old Docker images: ${e.message}"
+//                 }
+//             }
+//
+//             //Clean build artifacts from Jenkins workspace
+//             cleanWs()
+//         }
+//     }
+// }
 
 
 //     stage('Test') {
