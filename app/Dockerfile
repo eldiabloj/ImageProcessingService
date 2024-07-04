@@ -21,7 +21,6 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-
 # Copy the polybot source code into the container
 COPY polybot /app/polybot
 
@@ -88,8 +87,6 @@ CMD ["python", "-m", "polybot.bot"]
 
 ## Install dependencies
 #RUN pip install -r requirements.vir1
-
-
 
 ## Copy the rest of the application files
 #COPY . .
