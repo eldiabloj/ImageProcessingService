@@ -16,11 +16,11 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'docker-jenkinse', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
                     script {
                         try {
-                            //Change directory to where Dockerfile is located
+                            // Change directory to where Dockerfile is located
                             dir('app') {
-                                //Login to Docker registry
+                                // Login to Docker registry
                                 bat "docker login -u ${USERNAME} -p ${USERPASS}"
-                                //Build Docker image
+                                // Build Docker image
                                 bat "docker build -t ${IMG_NAME} ."
                             }
                         } catch (Exception e) {
@@ -35,7 +35,7 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    //Tag and push Docker image to registry
+                    // Tag and push Docker image to registry
                     bat "docker tag ${IMG_NAME} ${DOCKER_REGISTRY}:${BUILD_NUMBER}"
                     bat "docker push ${DOCKER_REGISTRY}:${BUILD_NUMBER}"
                 }
@@ -75,11 +75,11 @@ pipeline {
             // Clean up old containers but not the new one
             script {
                 try {
-                    //Fetch the container ID of the currently running container
+                    // Fetch the container ID of the currently running container
                     def containerId = bat(script: "docker ps -q -f ancestor=${DOCKER_REGISTRY}:${BUILD_NUMBER}", returnStdout: true).trim()
 
                     if (containerId) {
-                        //Remove all stopped containers with the same image except the current one
+                        // Remove all stopped containers with the same image except the current one
                         bat """
                             docker ps -a -q -f ancestor=${DOCKER_REGISTRY}:${BUILD_NUMBER} | findstr /V "${containerId}" | for /F "tokens=*" %%i in ('more') do docker rm -f %%i
                         """
@@ -91,7 +91,7 @@ pipeline {
                 }
             }
 
-            //Clean up old Docker images but keep the new one
+            // Clean up old Docker images but keep the new one
             script {
                 try {
                     bat """
@@ -102,7 +102,7 @@ pipeline {
                 }
             }
 
-            //Clean build artifacts from Jenkins workspace
+            // Clean build artifacts from Jenkins workspace
             cleanWs()
         }
     }
