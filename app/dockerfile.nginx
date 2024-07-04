@@ -23,4 +23,5 @@ CMD ["nginx", "-g", "daemon off;"]
 # Expose port 80 for the web server
 #EXPOSE 80
 
+
 # No command needed, Nginx will start by default
