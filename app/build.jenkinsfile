@@ -222,8 +222,8 @@ pipeline {
 //         }
 //     }
 // }
-
-
+//
+//
 //     stage('Test') {
 //         steps {
 //             script {
@@ -242,7 +242,7 @@ pipeline {
 //     }
 //
 //
-
+//
 //     post {
 //         always {
 //            // Clean up old containers but not the new one
@@ -279,11 +279,11 @@ pipeline {
 //             cleanWs()
 //         }
 //     }
-
-
-
-
-
+//
+//
+//
+//
+//
 // vir5
 // pipeline {
 //     agent any
@@ -365,11 +365,11 @@ pipeline {
 //         }
 //     }
 // }
-
-
-
-
-
+//
+//
+//
+//
+//
 // vir4
 // pipeline {
 //     agent any
@@ -455,11 +455,11 @@ pipeline {
 //             cleanWs()
 //         }
 //     }
-
-
-
-
-
+//
+//
+//
+//
+//
 //  biuld vir2
 //  pipeline {
 //      agent any
@@ -508,7 +508,7 @@ pipeline {
 //             }
 //         }
 //     } //stages
-
+//
 // }
 // deploy v1
 // pipeline {
@@ -576,11 +576,11 @@ pipeline {
 //            }
 //        }
 //    }
-//}
-
-
-
-
+// }
+//
+//
+//
+//
 // vir 2
 // pipeline {
 //     agent any
@@ -622,10 +622,10 @@ pipeline {
 //         }
 //     }
 // }
-
-
-
-
+//
+//
+//
+//
 // vir 1
 // pipeline {
 //     agent any
@@ -665,3 +665,4 @@ pipeline {
 //         ]
 //     }
 // }
+//
