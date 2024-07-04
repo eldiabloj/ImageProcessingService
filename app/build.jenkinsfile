@@ -17,11 +17,11 @@ pipeline {
                     script {
                         try {
                             // Change directory to where Dockerfile is located
-                            dir('app') {
+                            dir("${WORKSPACE}/app") {
                                 // Login to Docker registry
-                                bat "docker login -u ${USERNAME} -p ${USERPASS}"
+                                sh "docker login -u ${USERNAME} -p ${USERPASS}"
                                 // Build Docker image
-                                bat "docker build -t ${IMG_NAME} ."
+                                sh "docker build -t ${IMG_NAME} ."
                             }
                         } catch (Exception e) {
                             echo "Docker build failed"
@@ -36,8 +36,8 @@ pipeline {
             steps {
                 script {
                     // Tag and push Docker image to registry
-                    bat "docker tag ${IMG_NAME} ${DOCKER_REGISTRY}:${BUILD_NUMBER}"
-                    bat "docker push ${DOCKER_REGISTRY}:${BUILD_NUMBER}"
+                    sh "docker tag ${IMG_NAME} ${DOCKER_REGISTRY}:${BUILD_NUMBER}"
+                    sh "docker push ${DOCKER_REGISTRY}:${BUILD_NUMBER}"
                 }
             }
         }
@@ -56,7 +56,7 @@ pipeline {
             steps {
                 script {
                     docker.image("${DOCKER_REGISTRY}:${BUILD_NUMBER}").inside("-w /app") {
-                        bat '''
+                        sh '''
                         python3 -m venv venv
                         . venv/bin/activate
                         pip install -r requirements.txt
@@ -75,12 +75,12 @@ pipeline {
             script {
                 try {
                     // Fetch the container ID of the currently running container
-                    def containerId = bat(script: "docker ps -q -f ancestor=${DOCKER_REGISTRY}:${BUILD_NUMBER}", returnStdout: true).trim()
+                    def containerId = sh(script: "docker ps -q -f ancestor=${DOCKER_REGISTRY}:${BUILD_NUMBER}", returnStdout: true).trim()
 
                     if (containerId) {
                         // Remove all stopped containers with the same image except the current one
-                        bat """
-                            docker ps -a -q -f ancestor=${DOCKER_REGISTRY}:${BUILD_NUMBER} | findstr /V "${containerId}" | for /F "tokens=*" %%i in ('more') do docker rm -f %%i
+                        sh """
+                            docker ps -a -q -f ancestor=${DOCKER_REGISTRY}:${BUILD_NUMBER} | grep -v ${containerId} | xargs docker rm -f
                         """
                     } else {
                         echo "No old containers found to remove."
@@ -93,8 +93,8 @@ pipeline {
             // Clean up old Docker images but keep the new one
             script {
                 try {
-                    bat """
-                        docker images -q ${DOCKER_REGISTRY}:${BUILD_NUMBER} | for /F "tokens=*" %%i in ('more') do docker rmi -f %%i
+                    sh """
+                        docker images -q ${DOCKER_REGISTRY}:${BUILD_NUMBER} | xargs docker rmi -f
                     """
                 } catch (Exception e) {
                     echo "Error cleaning up old Docker images: ${e.message}"
