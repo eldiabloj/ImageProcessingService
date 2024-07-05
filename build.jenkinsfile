@@ -13,15 +13,20 @@ pipeline {
     stages {
         stage('Build Docker Image') {
             steps {
-                script {
-                    try {
-                     dir('app') {
-                            sh "docker login -u ${USERNAME} -p ${USERPASS}"
-                            sh "docker build -t ${IMG_NAME} ."
-                     }
-                    } catch (Exception e) {
-                        echo "Docker build failed"
-                        error "Build failed: ${e.message}"
+                withCredentials([usernamePassword(credentialsId: 'docker-jenkinse', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
+                    script {
+                        try {
+                            // Change directory to where Dockerfile is located
+                            dir('app') {
+                                // Login to Docker registry
+                                sh "docker login -u ${USERNAME} -p ${USERPASS}"
+                                // Build Docker image
+                                sh "docker build -t ${IMG_NAME} ."
+                            }
+                        } catch (Exception e) {
+                            echo "Docker build failed"
+                            error "Build failed: ${e.message}"
+                        }
                     }
                 }
             }
@@ -90,7 +95,6 @@ pipeline {
         }
     }
 }
-
 
 
 
