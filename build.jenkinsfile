@@ -18,10 +18,11 @@ pipeline {
                     script {
                         try {
                             // Change directory to where Dockerfile is located
-                            dir('app')                                 // Login to Docker registry
+                            dir('app')  {                               // Login to Docker registry
                                 sh "docker login -u ${USERNAME} -p ${USERPASS}"
                                 // Build Docker image
                                 sh "docker build -t ${IMG_NAME} ."
+                            }
                         } catch (Exception e) {
                             echo "Docker build failed"
                             error "Build failed: ${e.message}"
