@@ -16,8 +16,9 @@ pipeline {
                 script {
                     try {
                         // Change directory to where Dockerfile is located
-                        sh "cd app && docker login -u ${USERNAME} -p ${USERPASS}"
-                        sh "cd app && docker build -t ${IMG_NAME} ."
+                        sh "cd app"
+                        sh "docker login -u ${USERNAME} -p ${USERPASS}"
+                        sh "docker build -t ${IMG_NAME} ."
                     } catch (Exception e) {
                         echo "Docker build failed"
                         error "Build failed: ${e.message}"
