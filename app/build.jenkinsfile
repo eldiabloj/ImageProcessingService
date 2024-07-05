@@ -4,7 +4,7 @@ pipeline {
     environment {
         IMG_NAME = "polybot:${BUILD_NUMBER}"
         DOCKER_REGISTRY = "eldiabloj/polybot"
-        WORKSPACE_PATH = "/mnt/c/Users/oshrb/ImageProcessingService/app"
+//         WORKSPACE_PATH = "/mnt/c/Users/oshrb/ImageProcessingService/app"
     }
 
     parameters {
@@ -18,7 +18,7 @@ pipeline {
                     script {
                         try {
                             // Change directory to where Dockerfile is located
-                            dir('app') {
+                            cd app
                                 // Login to Docker registry
                                 bat "docker login -u ${USERNAME} -p ${USERPASS}"
                                 // Build Docker image
