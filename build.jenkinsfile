@@ -20,9 +20,9 @@ pipeline {
                             // Change directory to where Dockerfile is located
                             cd app
                                 // Login to Docker registry
-                                bat "docker login -u ${USERNAME} -p ${USERPASS}"
+                                sh "docker login -u ${USERNAME} -p ${USERPASS}"
                                 // Build Docker image
-                                bat "docker build -t ${IMG_NAME} ."
+                                sh "docker build -t ${IMG_NAME} ."
                         } catch (Exception e) {
                             echo "Docker build failed"
                             error "Build failed: ${e.message}"
