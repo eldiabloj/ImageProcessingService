@@ -24,7 +24,7 @@ pipeline {
                                 sh "docker build -t ${IMG_NAME} ."
                             }
                         } catch (Exception e) {
-                            echo "Docker build failed"
+                            echo "Docker build failed: ${e.message}"
                             error "Build failed: ${e.message}"
                         }
                     }
