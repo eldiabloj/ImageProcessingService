@@ -104,9 +104,9 @@ class Img:
             _, labels, centers = cv2.kmeans(pixels, num_clusters, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
 
             # Convert centers to 8-bit unsigned integer format
-            # centers = np.uint8(centers)
+            centers = np.uint8(centers)
             # Convert centers to 8-bit unsigned integer format
-            centers = centers.astype(np.uint8)
+            # centers = centers.astype(np.uint8)
 
             # Map each pixel to its corresponding cluster center
             segmented_image = centers[labels.flatten()]
