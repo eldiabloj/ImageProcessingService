@@ -17,7 +17,7 @@ pipeline {
                     script {
                         try {
                             // Change directory to where Dockerfile is located
-                            dir('app') {
+                            dir('app/polybot') {
                                 // Login to Docker registry
                                 sh "docker login -u ${USERNAME} -p ${USERPASS}"
                                 // Build Docker image
