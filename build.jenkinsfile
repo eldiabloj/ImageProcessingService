@@ -100,7 +100,7 @@ pipeline {
 
 
 //
-vir7
+// vir7
 // pipeline {
 //     agent any
 //
