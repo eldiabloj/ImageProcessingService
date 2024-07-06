@@ -148,7 +148,6 @@ class Img:
         except Exception as e:
             print(f"Error adjusting brightness: {e}")
             return None
-
     # def blend_images(self, other_image_data, alpha=0.5):
     #     try:
     #         if self.image_data is None or other_image_data is None:

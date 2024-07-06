@@ -147,5 +147,3 @@ try:
     bot.polling()
 except Exception as e:
     print(f"Error starting bot: {e}")
-
-
