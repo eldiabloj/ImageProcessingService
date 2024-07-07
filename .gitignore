@@ -121,6 +121,7 @@ celerybeat.pid
 
 # Environments
 .env
+snyk
 Dockerfile.agent
 minikube-linux-amd64
 minikube
