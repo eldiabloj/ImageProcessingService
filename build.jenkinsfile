@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            image 'eldiabloj/polybot:tagname'
+            image 'eldiabloj/polybot:36'
             args 'oj@ubuntu -v /var/run/docker.sock:/var/run/docker.sock'
         }
     }
@@ -40,7 +40,7 @@ pipeline {
                 script {
                     dir('app') {
                         withEnv(["SNYK_TOKEN=${SNYK_TOKEN}"]) {
-                            sh 'snyk auth $SNYK_TOKEN'
+                            sh 'snyk auth $snyk-jenkins'
                             sh 'snyk test --docker ${IMG_NAME}'
                         }
                     }
