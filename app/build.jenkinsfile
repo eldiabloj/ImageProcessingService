@@ -48,8 +48,8 @@ pipeline {
                         sh "echo Password: ****"  // Password will be masked
 
                         sh """
-                          sh 'snyk auth
-                          sh 'snyk test --docker ${IMG_NAME}'
+                          snyk auth
+                          snyk test --docker ${IMG_NAME}
                         """
                     }
                 }
