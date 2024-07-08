@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            image 'eldiabloj/polybot:${BUILD_NUMBER}'
+            image "eldiabloj/polybot:42"
             args 'oj@ubuntu -v /var/run/docker.sock:/var/run/docker.sock'
         }
     }
@@ -35,14 +35,23 @@ pipeline {
             }
         }
 
+        stages {
         stage('Snyk Scan') {
             steps {
                 script {
-                    dir('app') {
-                        withEnv(["SNYK_TOKEN=${SNYK_TOKEN}"]) {
-                            sh 'snyk auth $snyk-jenkins'
-                            sh 'snyk test --docker ${IMG_NAME}'
-                        }
+                    // Assuming you have credentials IDs 'username-password' and 'ssh-key' configured in Jenkins
+                    withCredentials([
+                        usernamePassword(credentialsId: 'SNYK_TOKEN', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD'),
+                        string(credentialsId: 'ssh-key', variable: 'SSH_KEY')
+                    ]) {
+                        // Access the username and password from environment variables
+                        sh "echo Username: $USERNAME"
+                        sh "echo Password: ****"  // Password will be masked
+
+                        sh """
+                            echo "SSH Key:"
+                            echo $SSH_KEY
+                        """
                     }
                 }
             }
@@ -90,7 +99,7 @@ pipeline {
                 try {
                     // Clean up old containers but not the new one
                     sh """
-                        docker ps -a -q -f ancestor=${DOCKER_REGISTRY}:${BUILD_NUMBER} | grep -v `docker ps -q -f ancestor=${DOCKER_REGISTRY}:${BUILD_NUMBER}` | xargs docker rm -f
+                        docker ps -a -q -f ancestor=eldiabloj/polybot:${BUILD_NUMBER} | grep -v `docker ps -q -f ancestor=eldiabloj/polybot:${BUILD_NUMBER}` | xargs docker rm -f
                     """
                 } catch (Exception e) {
                     echo "Error cleaning up old containers: ${e.message}"
@@ -98,7 +107,7 @@ pipeline {
 
                 try {
                     // Clean up old Docker images but keep the new one
-                    sh "docker images -q ${DOCKER_REGISTRY}:${BUILD_NUMBER} | xargs docker rmi -f"
+                    sh "docker images -q eldiabloj/polybot:${BUILD_NUMBER} | xargs docker rmi -f"
                 } catch (Exception e) {
                     echo "Error cleaning up old Docker images: ${e.message}"
                 }
@@ -110,7 +119,29 @@ pipeline {
     }
 }
 
+stages {
+        stage('Checkout and Build') {
+            steps {
+                script {
+                    // Assuming you have credentials IDs 'username-password' and 'ssh-key' configured in Jenkins
+                    withCredentials([
+                        usernamePassword(credentialsId: 'username-password', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD'),
+                        string(credentialsId: 'ssh-key', variable: 'SSH_KEY')
+                    ]) {
+                        // Access the username and password from environment variables
+                        sh "echo Username: $USERNAME"
+                        sh "echo Password: ****"  // Password will be masked
 
+                        sh """
+                            echo "SSH Key:"
+                            echo $SSH_KEY
+                        """
+                    }
+                }
+            }
+        }
+    }
+}
 
 // vir8
 // pipeline {
@@ -215,6 +246,17 @@ pipeline {
 //             }
 //         }
 //     }
-// }
+// }stage('Snyk Scan') {
+//             steps {
+//                 script {
+//                     dir('app') {
+//                         withEnv(["SNYK_TOKEN=${SNYK_TOKEN}"]) {
+//                             sh 'snyk auth $snyk-jenkins'
+//                             sh 'snyk test --docker ${IMG_NAME}'
+//                         }
+//                     }
+//                 }
+//             }
+//         }
 //
 //
