@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            image "eldiabloj/polybot:42"
+            image "eldiabloj/dockerfile_agent:latest"
             args 'oj@ubuntu -v /var/run/docker.sock:/var/run/docker.sock'
         }
     }
