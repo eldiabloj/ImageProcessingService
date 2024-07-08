@@ -48,8 +48,8 @@ pipeline {
                         sh "echo Password: ****"  // Password will be masked
 
                         sh """
-                            echo "SSH Key:"
-                            echo $SSH_KEY
+                          sh 'snyk auth
+                          sh 'snyk test --docker ${IMG_NAME}'
                         """
                     }
                 }
@@ -118,29 +118,31 @@ pipeline {
     }
 }
 
-stages {
-        stage('Checkout and Build') {
-            steps {
-                script {
-                    // Assuming you have credentials IDs 'username-password' and 'ssh-key' configured in Jenkins
-                    withCredentials([
-                        usernamePassword(credentialsId: 'username-password', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD'),
-                        string(credentialsId: 'ssh-key', variable: 'SSH_KEY')
-                    ]) {
-                        // Access the username and password from environment variables
-                        sh "echo Username: $USERNAME"
-                        sh "echo Password: ****"  // Password will be masked
 
-                        sh """
-                            echo "SSH Key:"
-                            echo $SSH_KEY
-                        """
-                    }
-                }
-            }
-        }
-    }
-}
+//
+//     stages {
+//         stage('Checkout and Build') {
+//             steps {
+//                 script {
+//                     // Assuming you have credentials IDs 'username-password' and 'ssh-key' configured in Jenkins
+//                     withCredentials([
+//                         usernamePassword(credentialsId: 'username-password', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD'),
+//                         string(credentialsId: 'ssh-key', variable: 'SSH_KEY')
+//                     ]) {
+//                         // Access the username and password from environment variables
+//                         sh "echo Username: $USERNAME"
+//                         sh "echo Password: ****"  // Password will be masked
+//
+//                         sh """
+//                             echo "SSH Key:"
+//                             echo $SSH_KEY
+//                         """
+//                     }
+//                 }
+//             }
+//         }
+//     }
+// }
 
 
 
