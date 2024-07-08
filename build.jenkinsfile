@@ -34,9 +34,7 @@ pipeline {
                 }
             }
         }
-    }
 
-    stages {
         stage('Snyk Scan') {
             steps {
                 script {
