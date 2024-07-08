@@ -88,6 +88,7 @@ pipeline {
         always {
             script {
                 try {
+                    // Clean up old containers but not the new one
                     sh """
                         docker ps -a -q -f ancestor=${DOCKER_REGISTRY}:${BUILD_NUMBER} | grep -v `docker ps -q -f ancestor=${DOCKER_REGISTRY}:${BUILD_NUMBER}` | xargs docker rm -f
                     """
@@ -96,16 +97,17 @@ pipeline {
                 }
 
                 try {
+                    // Clean up old Docker images but keep the new one
                     sh "docker images -q ${DOCKER_REGISTRY}:${BUILD_NUMBER} | xargs docker rmi -f"
                 } catch (Exception e) {
                     echo "Error cleaning up old Docker images: ${e.message}"
                 }
 
+                // Clean build artifacts from Jenkins workspace
                 cleanWs()
             }
         }
     }
-}
 
 
 
