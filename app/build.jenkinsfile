@@ -40,7 +40,6 @@ pipeline {
                 script {
                     withCredentials([
                         string(credentialsId: 'SNYK_TOKEN', variable: 'SNYK_TOKEN'),
-                        string(credentialsId: 'ssh-key', variable: 'SSH_KEY')
                     ]) {
                         sh "snyk auth ${SNYK_TOKEN}"
                         sh "snyk test --docker ${IMG_NAME}"
