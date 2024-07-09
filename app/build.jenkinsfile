@@ -88,29 +88,32 @@ pipeline {
     post {
         always {
             script {
-                try {
-                    // Clean up old containers but not the new one
-                    sh """
-                        docker ps -a -q -f ancestor=${DOCKER_REGISTRY}:${BUILD_NUMBER} | grep -v `docker ps -q -f ancestor=${DOCKER_REGISTRY}:${BUILD_NUMBER}` | xargs docker rm -f
-                    """
-                } catch (Exception e) {
-                    echo "Error cleaning up old containers: ${e.message}"
-                }
+                def containerId = sh(script: "docker ps -q -f ancestor=${DOCKER_REPO}:${BUILD_NUMBER}", returnStdout: true).trim()
 
-                try {
-                    // Clean up old Docker images but keep the new one
-                    sh "docker images -q ${DOCKER_REGISTRY}:${BUILD_NUMBER} | xargs docker rmi -f"
-                } catch (Exception e) {
-                    echo "Error cleaning up old Docker images: ${e.message}"
-                }
+                sh """
+                    for id in \$(docker ps -a -q -f ancestor=${DOCKER_REPO}:${BUILD_NUMBER}); do
+                        if [ "\$id" != "${containerId}" ]; then
+                            docker rm -f \$id || true
+                        fi
+                    done
+                """
+            }
+            script {
+                sh """
+                    docker images --format '{{.Repository}}:{{.Tag}} {{.ID}}' | grep '${DOCKER_REPO}' | grep -v ':latest' | grep -v ':${BUILD_NUMBER}' | awk '{print \$2}' | xargs --no-run-if-empty docker rmi -f || true
+                """
+            }
 
-                // Clean build artifacts from Jenkins workspace
-                cleanWs()
+            cleanWs()
+        }
+
+        failure {
+            script {
+                def errorMessage = currentBuild.result == 'FAILURE' ? currentBuild.description : 'Build failed'
+                echo "Error occurred: ${errorMessage}"
             }
         }
     }
-}
-
 
 
 
