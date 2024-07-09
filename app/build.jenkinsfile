@@ -39,7 +39,7 @@ pipeline {
             steps {
                 script {
                     withCredentials([
-                        string(credentialsId: 'SNYK_TOKEN', variable: 'SNYK_TOKEN'),
+                        string(credentialsId: 'SNYK_TOKEN', variable: 'SNYK_TOKEN')
                     ]) {
                         sh "snyk auth ${SNYK_TOKEN}"
                         sh "snyk test --docker ${IMG_NAME}"
@@ -57,15 +57,12 @@ pipeline {
             }
         }
 
-        stages {
-        stage('Build Docker Image') {
+        stage('Deploy polybot') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'docker-jenkinse', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
-                    script {
-                        try {
-                            dir('app') {
-                                sh "docker login -u ${USERNAME} -p ${USERPASS}"
-                                sh "docker build -t ${IMG_NAME} ."
+                script {
+                    echo "Deploying to Kubernetes cluster..."
+                    echo "Using Docker image: ${params.IMAGE_TAG}"
+                    sh "kubectl set image deployment/polybot polybot=${params.IMAGE_TAG}"
                 }
             }
         }
