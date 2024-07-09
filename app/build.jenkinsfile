@@ -35,6 +35,14 @@ pipeline {
             }
         }
 
+        stage('Verify Docker Image') {
+            steps {
+                script {
+                    sh "docker images ${IMG_NAME}"
+                }
+            }
+        }
+
         stage('Snyk Scan') {
             steps {
                 script {
