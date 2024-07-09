@@ -1,3 +1,11 @@
+pipeline {
+    agent {
+        docker {
+            image "eldiabloj/polybot:tagname"
+            args "-v /var/run/docker.sock:/var/run/docker.sock"
+        }
+    }
+
     environment {
         IMG_NAME = "polybot:${BUILD_NUMBER}"
         DOCKER_REGISTRY = "eldiabloj/polybot"
@@ -31,16 +39,11 @@
             steps {
                 script {
                     withCredentials([
-                        usernamePassword(credentialsId: 'SNYK_TOKEN', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD'),
+                        string(credentialsId: 'SNYK_TOKEN', variable: 'SNYK_TOKEN'),
                         string(credentialsId: 'ssh-key', variable: 'SSH_KEY')
                     ]) {
-                        sh "echo Username: $USERNAME"
-                        sh "echo Password: ****"  // Password will be masked
-
-                        sh """
-                          snyk auth $SNYK_TOKEN
-                          snyk test --docker ${IMG_NAME}
-                        """
+                        sh "snyk auth ${SNYK_TOKEN}"
+                        sh "snyk test --docker ${IMG_NAME}"
                     }
                 }
             }
@@ -106,7 +109,7 @@
             }
         }
     }
-
+}
 
 
 
