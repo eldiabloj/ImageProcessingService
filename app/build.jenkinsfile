@@ -9,7 +9,7 @@ pipeline {
     environment {
         IMG_NAME = "polybot:${BUILD_NUMBER}"
         DOCKER_REGISTRY = "eldiabloj/polybot"
-        SNYK_TOKEN = credentials("snyk-jenkins")
+        SNYK_TOKEN = credentials("SNYK_TOKEN")
     }
 
     parameters {
