@@ -1,15 +1,15 @@
 pipeline {
     agent {
         docker {
-            image "eldiabloj/dockerfile_agent:latest"
-            args 'oj@ubuntu -v /var/run/docker.sock:/var/run/docker.sock'
+            image "eldiabloj/polybot:tagname"
+            args "oj@ubuntu -v /var/run/docker.sock:/var/run/docker.sock"
         }
     }
 
     environment {
         IMG_NAME = "polybot:${BUILD_NUMBER}"
         DOCKER_REGISTRY = "eldiabloj/polybot"
-        SNYK_TOKEN = credentials('snyk-jenkins')
+        SNYK_TOKEN = credentials("snyk-jenkins")
     }
 
     parameters {
@@ -92,31 +92,64 @@ pipeline {
         }
     }
 
-    post {
+            post {
         always {
-            script {
-                try {
-                    // Clean up old containers but not the new one
-                    sh """
-                        docker ps -a -q -f ancestor=eldiabloj/polybot:${BUILD_NUMBER} | grep -v `docker ps -q -f ancestor=eldiabloj/polybot:${BUILD_NUMBER}` | xargs docker rm -f
-                    """
-                } catch (Exception e) {
-                    echo "Error cleaning up old containers: ${e.message}"
-                }
+            node {
+                script {
+                    try {
+                        // Clean up old containers but not the new one
+                        sh """
+                            docker ps -a -q -f ancestor=${DOCKER_REGISTRY}:${BUILD_NUMBER} | grep -v `docker ps -q -f ancestor=${DOCKER_REGISTRY}:${BUILD_NUMBER}` | xargs docker rm -f
+                        """
+                    } catch (Exception e) {
+                        echo "Error cleaning up old containers: ${e.message}"
+                    }
 
-                try {
-                    // Clean up old Docker images but keep the new one
-                    sh "docker images -q eldiabloj/polybot:${BUILD_NUMBER} | xargs docker rmi -f"
-                } catch (Exception e) {
-                    echo "Error cleaning up old Docker images: ${e.message}"
-                }
+                    try {
+                        // Clean up old Docker images but keep the new one
+                        sh "docker images -q ${DOCKER_REGISTRY}:${BUILD_NUMBER} | xargs docker rmi -f"
+                    } catch (Exception e) {
+                        echo "Error cleaning up old Docker images: ${e.message}"
+                    }
 
-                // Clean build artifacts from Jenkins workspace
-                cleanWs()
+                    // Clean build artifacts from Jenkins workspace
+                    cleanWs()
+                }
             }
         }
     }
 }
+
+
+
+
+
+
+//     post {
+//         always {
+//             script {
+//                 try {
+//                     // Clean up old containers but not the new one
+//                     sh """
+//                         docker ps -a -q -f ancestor=eldiabloj/polybot:${BUILD_NUMBER} | grep -v `docker ps -q -f ancestor=eldiabloj/polybot:${BUILD_NUMBER}` | xargs docker rm -f
+//                     """
+//                 } catch (Exception e) {
+//                     echo "Error cleaning up old containers: ${e.message}"
+//                 }
+//
+//                 try {
+//                     // Clean up old Docker images but keep the new one
+//                     sh "docker images -q eldiabloj/polybot:${BUILD_NUMBER} | xargs docker rmi -f"
+//                 } catch (Exception e) {
+//                     echo "Error cleaning up old Docker images: ${e.message}"
+//                 }
+//
+//                 // Clean build artifacts from Jenkins workspace
+//                 cleanWs()
+//             }
+//         }
+//     }
+// }
 
 
 //
