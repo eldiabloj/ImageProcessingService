@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             image "eldiabloj/dockerfile_agent:latest"
-            args "-v /var/run/docker.sock:/var/run/docker.sock"
+            args "--User oj@ubuntu -v /var/run/docker.sock:/var/run/docker.sock"
         }
     }
 
