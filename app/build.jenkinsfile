@@ -49,7 +49,7 @@ pipeline {
                 script {
                     echo "Deploying to Kubernetes cluster..."
                     echo "Using Docker image: ${params.IMAGE_TAG}"
-                    sh "kubectl set image deployment/polybot polybot=${params.IMAGE_TAG}"
+                    echo "kubectl set image deployment/polybot polybot=${params.IMAGE_TAG}"
                 }
             }
         }
