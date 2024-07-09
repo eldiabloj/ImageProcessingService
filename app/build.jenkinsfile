@@ -35,27 +35,6 @@ pipeline {
             }
         }
 
-        stage('Verify Docker Image') {
-            steps {
-                script {
-                    sh "docker images ${IMG_NAME}"
-                }
-            }
-        }
-
-        stage('Snyk Scan') {
-            steps {
-                script {
-                    withCredentials([
-                        string(credentialsId: 'SNYK_TOKEN', variable: 'SNYK_TOKEN')
-                    ]) {
-                        sh "snyk auth ${SNYK_TOKEN}"
-                        sh "snyk container test ${IMG_NAME} --policy-path=.snyk"
-                    }
-                }
-            }
-        }
-
         stage('Push Docker Image') {
             steps {
                 script {
@@ -91,6 +70,29 @@ pipeline {
             }
         }
     }
+
+    tage('Verify Docker Image') {
+        steps {
+            script {
+                sh "docker images ${IMG_NAME}"
+                }
+            }
+        }
+
+        stage('Snyk Scan') {
+            steps {
+                script {
+                    withCredentials([
+                        string(credentialsId: 'SNYK_TOKEN', variable: 'SNYK_TOKEN')
+                    ]) {
+                        sh "snyk auth ${SNYK_TOKEN}"
+                        sh "snyk container test ${IMG_NAME} --policy-path=.snyk"
+                    }
+                }
+            }
+        }
+    }
+
 
     post {
         always {
