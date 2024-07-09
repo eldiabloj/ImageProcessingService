@@ -92,7 +92,7 @@ pipeline {
         }
     }
 
-            post {
+    post {
         always {
             node {
                 script {
