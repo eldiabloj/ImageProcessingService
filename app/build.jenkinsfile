@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             image "eldiabloj/dockerfile_agent:latest"
-            args "--user oj@ubuntu -v /var/run/docker.sock:/var/run/docker.sock"
+            args "--user root -v /var/run/docker.sock:/var/run/docker.sock"
         }
     }
 
@@ -88,6 +88,7 @@ pipeline {
     post {
         always {
             script {
+                def DOCKER_REGISTRY = env.DOCKER_REGISTRY
                 def containerId = sh(script: "docker ps -q -f ancestor=${DOCKER_REGISTRY}:${BUILD_NUMBER}", returnStdout: true).trim()
 
                 sh """
