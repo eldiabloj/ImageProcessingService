@@ -57,12 +57,15 @@ pipeline {
             }
         }
 
-        stage('Deploy polybot') {
+        stages {
+        stage('Build Docker Image') {
             steps {
-                script {
-                    echo "Deploying to Kubernetes cluster..."
-                    echo "Using Docker image: ${params.IMAGE_TAG}"
-                    sh "kubectl set image deployment/polybot polybot=${params.IMAGE_TAG}"
+                withCredentials([usernamePassword(credentialsId: 'docker-jenkinse', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
+                    script {
+                        try {
+                            dir('app') {
+                                sh "docker login -u ${USERNAME} -p ${USERPASS}"
+                                sh "docker build -t ${IMG_NAME} ."
                 }
             }
         }
