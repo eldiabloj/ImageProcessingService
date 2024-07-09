@@ -50,7 +50,7 @@ pipeline {
                         string(credentialsId: 'SNYK_TOKEN', variable: 'SNYK_TOKEN')
                     ]) {
                         sh "snyk auth ${SNYK_TOKEN}"
-                        sh "snyk test --docker ${IMG_NAME}"
+                        sh "snyk container test ${IMG_NAME}:latest --policy-path=.snyk"
                     }
                 }
             }
