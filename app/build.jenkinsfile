@@ -70,14 +70,6 @@ pipeline {
             }
         }
 
-        stage('Verify Docker Image') {
-            steps {
-                script {
-                    sh "docker images ${IMG_NAME}"
-                }
-            }
-        }
-
     post {
         always {
             script {
