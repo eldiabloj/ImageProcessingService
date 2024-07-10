@@ -70,6 +70,28 @@ pipeline {
             }
         }
 
+        stage('Verify Docker Image') {
+            steps {
+                script {
+                    sh "docker images ${IMG_NAME}"
+                }
+            }
+        }
+
+        stage('Snyk Scan') {
+            steps {
+                script {
+                    withCredentials([
+                        string(credentialsId: 'SNYK_TOKEN', variable: 'SNYK_TOKEN')
+                    ]) {
+                        sh "snyk auth ${SNYK_TOKEN}"
+                        echo "snyk container test ${IMG_NAME} --policy-path=.snyk"
+                    }
+                }
+            }
+        }
+    }
+
     post {
         always {
             script {
