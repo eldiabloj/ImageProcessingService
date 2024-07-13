@@ -94,7 +94,7 @@ pipeline {
             steps {
                 script {
                     echo "Starting Unit Tests"
-                    docker.image("${DOCKER_REPO}:${BUILD_NUMBER}").inside {
+                    docker.image("${DOCKER_REGISTRY}:${BUILD_NUMBER}").inside {
                         sh """
                         python3 -m venv venv
                         . venv/bin/activate
