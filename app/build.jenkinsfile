@@ -108,7 +108,7 @@ pipeline {
                         pip install pytest-xdist pytest-timeout
 
                         # Run pytest with verbosity and timeout for each test
-                        python3 -m pytest -n 4 --timeout=60 --junitxml results.xml app/test/*.py
+                        python3 -m pytest -n 4 --timeout=60 --junitxml results.xml tests
                         deactivate
                         '''
                     }
