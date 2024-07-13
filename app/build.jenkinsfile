@@ -99,18 +99,13 @@ pipeline {
                         sh '''
                         echo "Current directory:"
                         pwd
-                        echo "Contents of the directory:"
-                        ls -R
+
 
                         python3 -m venv venv
                         . venv/bin/activate
                         pip install --upgrade pip
                         pip install -r app/requirements.txt
                         pip install pytest-xdist pytest-timeout
-
-                        # Check if test files are present
-                        echo "Checking for test files in polybot directory"
-                        ls polybot/*.py
 
                         # Run pytest with verbosity and timeout for each test
                         python3 -m pytest -n 4 --timeout=60 --junitxml results.xml app/polybot/*.py
