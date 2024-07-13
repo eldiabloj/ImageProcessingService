@@ -113,7 +113,7 @@ pipeline {
                         ls polybot/*.py
 
                         # Run pytest with verbosity and timeout for each test
-                        python3 -m pytest -n 4 --timeout=60 --junitxml results.xml polybot/*.py
+                        python3 -m pytest -n 4 --timeout=60 --junitxml results.xml app/polybot/*.py
                         deactivate
                         '''
                     }
