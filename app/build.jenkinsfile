@@ -95,7 +95,7 @@ pipeline {
             steps {
                 script {
                     echo "Starting Unit Tests"
-                    docker.image("${DOCKER_REGISTRY}:${BUILD_NUMBER}").inside("-w /app") {
+                    docker.image("${DOCKER_REGISTRY}:${BUILD_NUMBER}").inside {
                         sh '''
                         echo "Current directory:"
                         pwd
@@ -108,7 +108,7 @@ pipeline {
                         pip install pytest-xdist pytest-timeout
 
                         # Run pytest with verbosity and timeout for each test
-                        python3 -m pytest -n 4 --timeout=60 --junitxml results.xml app/polybot/*.py
+                        python3 -m pytest -n 4 --timeout=60 --junitxml results.xml app/tests/*.py
                         deactivate
                         '''
                     }
