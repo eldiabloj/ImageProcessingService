@@ -90,21 +90,32 @@ pipeline {
                 }
             }
         }
+
         stage('Unit Test') {
             steps {
                 script {
                     echo "Starting Unit Tests"
-                    docker.image("${DOCKER_REGISTRY}:${BUILD_NUMBER}").inside {
-                        sh """
+                    docker.image("${DOCKER_REGISTRY}:${BUILD_NUMBER}").inside("-w /app") {
+                        sh '''
+                        echo "Current directory:"
+                        pwd
+                        echo "Contents of the directory:"
+                        ls -R
+
                         python3 -m venv venv
                         . venv/bin/activate
                         pip install --upgrade pip
                         pip install -r app/requirements.txt
                         pip install pytest-xdist pytest-timeout
+
+                        # Check if test files are present
+                        echo "Checking for test files in polybot directory"
+                        ls polybot/*.py
+
                         # Run pytest with verbosity and timeout for each test
                         python3 -m pytest -n 4 --timeout=60 --junitxml results.xml polybot/*.py
                         deactivate
-                        """
+                        '''
                     }
                     echo "Unit Tests completed"
                 }
@@ -147,6 +158,30 @@ pipeline {
 }
 
 
+
+
+
+//        stage('Unit Test') {
+//             steps {
+//                 script {
+//                     echo "Starting Unit Tests"
+//                     docker.image("${DOCKER_REGISTRY}:${BUILD_NUMBER}").inside {
+//                         sh """
+//                         python3 -m venv venv
+//                         . venv/bin/activate
+//                         pip install --upgrade pip
+//                         pip install -r app/requirements.txt
+//                         pip install pytest-xdist pytest-timeout
+//                         # Run pytest with verbosity and timeout for each test
+//                         python3 -m pytest -n 4 --timeout=60 --junitxml results.xml tests/*.py
+//                         deactivate
+//                         """
+//                     }
+//                     echo "Unit Tests completed"
+//                 }
+//             }
+//         }
+//     }
 // vir9
 // pipeline {
 //     agent {
