@@ -99,7 +99,7 @@ pipeline {
                         python3 -m venv venv
                         . venv/bin/activate
                         pip install --upgrade pip
-                        pip install -r requirements.txt
+                        pip install -r app/requirements.txt
                         pip install pytest-xdist pytest-timeout
                         # Run pytest with verbosity and timeout for each test
                         python3 -m pytest -n 4 --timeout=60 --junitxml results.xml tests/*.py
