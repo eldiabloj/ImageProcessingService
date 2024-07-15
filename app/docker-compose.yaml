@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8081:8081"
+      - "90:90"
     volumes:
       - ./:/app
     command: python -m polybot.bot
@@ -16,28 +16,7 @@ services:
       context: .
       dockerfile: dockerfile.nginx
     ports:
-      - "90:90"
-
-
-#version: '3.8'
-#
-#services:
-#  app:
-#    build:
-#      context: .
-#      dockerfile: Dockerfile
-#    ports:
-#      - "8081:8081"
-#    volumes:
-#      - ./:/app
-#
-#
-#  web:
-#    build:
-#      context: .
-#      dockerfile: dockerfile.nginx
-#    ports:
-#      - "90:90"
+      - "80:80"
 
 
 #API_TOKEN = 'YOUR_BOT_API_TOKEN'
