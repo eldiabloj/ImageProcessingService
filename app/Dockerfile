@@ -1,41 +1,79 @@
-# Use Python 3.10 as the base image
 FROM python:3.10.12-slim-bullseye
 
 # Set environment variables
-#ENV PYTHONDONTWRITEBYTECODE 1
-#ENV PYTHONUNBUFFERED 1
-
+ENV PYTHONPATH="${PYTHONPATH}:/app"
 
 # Set working directory
 WORKDIR /app
 
-
 # Install system dependencies
-RUN apt-get update \
-    && apt-get install -y \
-        libgl1-mesa-glx \
-        libgl1-mesa-dev \
+RUN apt-get update && apt-get install -y \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    libgl1-mesa-glx \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-
 
 # Install Python dependencies
 COPY requirements.txt .
-# Install Python dependencies
 RUN pip install --no-cache-dir --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-
 # Copy the rest of the application files to the working directory
 COPY . .
-# Copy the polybot source code into the container
-WORKDIR /app/polybot /app
+
+# Set the working directory to the application directory
+WORKDIR /app/polybot
 
 # Expose the port if needed
-EXPOSE 90:90
+EXPOSE 90
 
 # Define the command to run the application
-CMD ["python", "-m", "polybot.bot"]
+CMD ["python", "bot.py"]
 
+
+#ver3
+#FROM python:3.10.12-slim-bullseye
+#
+## Set environment variables
+##ENV PYTHONDONTWRITEBYTECODE 1
+##ENV PYTHONUNBUFFERED 1
+#ENV PYTHONPATH="${PYTHONPATH}:/app"
+#
+## Set working directory
+#WORKDIR /app
+#
+#
+## Install system dependencies
+#RUN apt-get update && apt-get install -y \
+#    libglib2.0-0 \
+#    libsm6 \
+#    libxext6 \
+#    libxrender-dev \
+#    && apt-get clean \
+#    && rm -rf /var/lib/apt/lists/*
+#
+#
+## Install Python dependencies
+#COPY requirements.txt .
+## Install Python dependencies
+#RUN pip install --no-cache-dir --upgrade pip
+#RUN pip install --no-cache-dir -r requirements.txt
+#
+#
+## Copy the rest of the application files to the working directory
+#COPY . .
+## Copy the polybot source code into the container
+#WORKDIR /app/polybot /app
+#
+## Expose the port if needed
+#EXPOSE 90:90
+#
+## Define the command to run the application
+#CMD ["python", "-m", "polybot.bot"]
+#
 
 
 
