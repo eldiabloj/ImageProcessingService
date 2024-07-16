@@ -65,7 +65,7 @@ pipeline {
         }
     }
 
-        stage('Test') {
+    stage('Test') {
             steps {
                 script {
                     docker.image("${DOCKER_REGISTRY}:${BUILD_NUMBER}").inside("-w /app") {
