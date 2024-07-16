@@ -44,15 +44,24 @@ pipeline {
             }
         }
 
-        stage('Deploy polybot') {
+        stage('Deploy Dev') {
+            environment {
+//                 DOCKER_HOST = 'tcp://127.0.0.1:2375'  // Specify your Docker host
+            }
             steps {
-                script {
-                    echo "Deploying to Kubernetes cluster..."
-                    echo "Using Docker image: ${params.IMAGE_TAG}"
-                    echo "kubectl set image deployment/polybot polybot=${params.IMAGE_TAG}"
-                }
+                echo sh 'docker-compose -f docker-compose.yaml up -d'
             }
         }
+
+        stage('Deploy Prod') {
+            environment {
+//                 DOCKER_HOST = 'tcp://127.0.0.1:2376'  // Specify your Docker host
+            }
+            steps {
+                echo sh 'docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up -d'
+            }
+        }
+    }
 
         stage('Test') {
             steps {
