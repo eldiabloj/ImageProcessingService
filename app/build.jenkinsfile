@@ -44,25 +44,12 @@ pipeline {
             }
         }
 
-        stage('Deploy Dev') {
-            environment {
-                echo DOCKER_HOST = 'tcp://127.0.0.1:2375'
-
-            }
+        stage('Deploy polybot to dev') {
             steps {
-
-                echo 'docker-compose -f docker-compose.yaml up -d'
-            }
-        }
-
-        stage('Deploy Prod') {
-            environment {
-                echo DOCKER_HOST = 'tcp://127.0.0.1:2376'
-
-            }
-            steps {
-
-                echo 'docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up -d'
+                script {
+                      echo 'docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up -d'
+                      echo 'docker-compose -f docker-compose.yaml up -d'
+                }
             }
         }
 
@@ -440,11 +427,11 @@ pipeline {
 //             }
 //         }
 //
-//         stage('Deploy polybot') {
+//         stage('Deploy polybot to dev') {
 //             steps {
 //                 script {
-//                     echo "Deploying to Kubernetes cluster..."
-//                     echo "Using Docker image: ${params.IMAGE_TAG}"
+//                     docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up -d
+//                        'docker-compose -f docker-compose.yaml up -d'
 //                     sh "kubectl set image deployment/polybot polybot=${params.IMAGE_TAG}"
 //                 }
 //             }
