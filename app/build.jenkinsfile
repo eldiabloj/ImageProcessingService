@@ -46,19 +46,19 @@ pipeline {
 
         stage('Deploy Dev') {
             environment {
-//                 DOCKER_HOST = 'tcp://127.0.0.1:2375'  // Specify your Docker host
+               // DOCKER_HOST = 'tcp://127.0.0.1:2375'
             }
             steps {
-                echo sh 'docker-compose -f docker-compose.yaml up -d'
+                echo 'docker-compose -f docker-compose.yaml up -d'
             }
         }
 
         stage('Deploy Prod') {
             environment {
-//                 DOCKER_HOST = 'tcp://127.0.0.1:2376'  // Specify your Docker host
+               // DOCKER_HOST = 'tcp://127.0.0.1:2376'
             }
             steps {
-                echo sh 'docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up -d'
+                echo 'docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up -d'
             }
         }
     }
