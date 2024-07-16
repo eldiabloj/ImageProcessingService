@@ -63,9 +63,8 @@ pipeline {
                 echo 'docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up -d'
             }
         }
-    }
 
-    stage('Test') {
+        stage('Test') {
             steps {
                 script {
                     docker.image("${DOCKER_REGISTRY}:${BUILD_NUMBER}").inside("-w /app") {
