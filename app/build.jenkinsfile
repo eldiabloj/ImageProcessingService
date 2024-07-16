@@ -46,23 +46,87 @@ pipeline {
 
         stage('Deploy Dev') {
             environment {
-               // DOCKER_HOST = 'tcp://127.0.0.1:2375'
+
             }
             steps {
+                echo DOCKER_HOST = 'tcp://127.0.0.1:2375'
                 echo 'docker-compose -f docker-compose.yaml up -d'
             }
         }
 
         stage('Deploy Prod') {
             environment {
-               // DOCKER_HOST = 'tcp://127.0.0.1:2376'
+
             }
             steps {
+                echo DOCKER_HOST = 'tcp://127.0.0.1:2376'
                 echo 'docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up -d'
             }
         }
     }
 
+        stage('Test') {
+            steps {
+                script {
+                    docker.image("${DOCKER_REGISTRY}:${BUILD_NUMBER}").inside("-w /app") {
+                        sh '''
+                        python3 -m venv venv
+                        . venv/bin/activate
+                        pip install -r app/requirements.txt
+                        pylint --disable=C0301,C0114,E1101,C0116,C0103,W0718,E0401,W0613,R1722,W0612,R0912,C0304,C0115,R1705,E1136 app/polybot/*.py
+                        deactivate
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('Verify Docker Image') {
+            steps {
+                script {
+                    sh "docker images ${IMG_NAME}"
+                }
+            }
+        }
+
+        stage('Snyk Scan') {
+            steps {
+                script {
+                    withCredentials([
+                        string(credentialsId: 'SNYK_TOKEN', variable: 'SNYK_TOKEN')
+                    ]) {
+                        sh "snyk auth ${SNYK_TOKEN}"
+                        echo "snyk container test ${IMG_NAME} --policy-path=.snyk"
+                    }
+                }
+            }
+        }
+
+        stage('Unit Test') {
+            steps {
+                script {
+                    echo "Starting Unit Tests"
+                    docker.image("${DOCKER_REGISTRY}:${BUILD_NUMBER}").inside {
+                        sh '''
+                        echo "Current directory:"
+                        pwd
+
+
+                        python3 -m venv venv
+                        . venv/bin/activate
+                        pip install --upgrade pip
+                        pip install -r app/requirements.txt
+                        pip install pytest-xdist pytest-timeout
+
+                        # Run pytest with verbosity and timeout for each test
+                        python3 -m pytest -n 4 --timeout=60 --junitxml results.xml app/test/*.py
+                        deactivate
+                        '''
+                    }
+                    echo "Unit Tests completed"
+                }
+            }
+        }
 
     stage('Push to Nexus') {
         steps {
@@ -104,7 +168,7 @@ pipeline {
             cleanWs()
         }
     }
-
+}
 
 
 
