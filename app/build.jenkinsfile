@@ -127,7 +127,14 @@ pipeline {
                 }
             }
         }
+    stages {
+        stage('Example') {
+            steps {
+                foo('Jenkins')
+            }
+        }
     }
+}
 
 
 
