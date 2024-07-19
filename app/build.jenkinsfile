@@ -10,6 +10,7 @@ pipeline {
         IMG_NAME = "polybot:${BUILD_NUMBER}"
         DOCKER_REGISTRY = "eldiabloj/polybot"
         SNYK_TOKEN = credentials("SNYK_TOKEN")
+         @Library('osher-s-shared-lib')
     }
 
     parameters {
@@ -127,14 +128,25 @@ pipeline {
                 }
             }
         }
-    stages {
-        stage('Example') {
+
+    stage('Run my.py from another repository') {
             steps {
-                foo('Jenkins')
+                script {
+                    sh '''
+                    # Clone the repository containing my.py
+                    git clone https://github.com/eldiabloj/osher-s-shared-lib.git
+
+                    # Change directory to the cloned repository
+                    cd another-repo
+
+                    # Run the my.py script
+                    python3 my.py
+                    '''
+                }
             }
         }
     }
-}
+
 
 
 
