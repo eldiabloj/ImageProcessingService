@@ -10,7 +10,6 @@ pipeline {
         IMG_NAME = "polybot:${BUILD_NUMBER}"
         DOCKER_REGISTRY = "eldiabloj/polybot"
         SNYK_TOKEN = credentials("SNYK_TOKEN")
-         @Library('osher-s-shared-lib')
     }
 
     parameters {
