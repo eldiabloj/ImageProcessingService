@@ -136,7 +136,6 @@ pipeline {
                     git clone https://github.com/eldiabloj/osher-s-shared-lib.git
 
                     # Change directory to the cloned repository
-                    cd another-repo
 
                     # Run the my.py script
                     python3 my.py
