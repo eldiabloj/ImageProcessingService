@@ -10,10 +10,11 @@ pipeline {
         IMG_NAME = "polybot:${BUILD_NUMBER}"
         DOCKER_REGISTRY = "eldiabloj/polybot"
         SNYK_TOKEN = credentials("SNYK_TOKEN")
+        @Library('osher-s-shared-lib') _
     }
 
     parameters {
-        string(name: 'IMAGE_TAG', defaultValue: '', description: 'eldiabloj/polybot:latest')
+        string(name: 'IMAGE_TAG', defaultValue: '', description: 'Image tag for Docker')
     }
 
     stages {
@@ -21,14 +22,9 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker-jenkinse', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
                     script {
-                        try {
-                            dir('app') {
-                                sh "docker login -u ${USERNAME} -p ${USERPASS}"
-                                sh "docker build -t ${IMG_NAME} ."
-                            }
-                        } catch (Exception e) {
-                            echo "Docker build failed: ${e.message}"
-                            error "Build failed: ${e.message}"
+                        dir('app') {
+                            sh "docker login -u ${USERNAME} -p ${USERPASS}"
+                            sh "docker build -t ${IMG_NAME} ."
                         }
                     }
                 }
@@ -47,9 +43,8 @@ pipeline {
         stage('Deploy polybot to dev') {
             steps {
                 script {
-                      //There should be environment variables here, but because there is no cluster or VM to send them it is only an echo command
-                      echo 'docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up -d'
-                      echo 'docker-compose -f docker-compose.yaml up -d'
+                    sh 'docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up -d'
+                    sh 'docker-compose -f docker-compose.yaml up -d'
                 }
             }
         }
@@ -80,12 +75,10 @@ pipeline {
 
         stage('Snyk Scan') {
             steps {
-                script {
-                    withCredentials([
-                        string(credentialsId: 'SNYK_TOKEN', variable: 'SNYK_TOKEN')
-                    ]) {
+                withCredentials([string(credentialsId: 'SNYK_TOKEN', variable: 'SNYK_TOKEN')]) {
+                    script {
                         sh "snyk auth ${SNYK_TOKEN}"
-                        echo "snyk container test ${IMG_NAME} --policy-path=.snyk"
+                        sh "snyk container test ${IMG_NAME} --policy-path=.snyk"
                     }
                 }
             }
@@ -94,13 +87,8 @@ pipeline {
         stage('Unit Test') {
             steps {
                 script {
-                    echo "Starting Unit Tests"
                     docker.image("${DOCKER_REGISTRY}:${BUILD_NUMBER}").inside {
                         sh '''
-                        echo "Current directory:"
-                        pwd
-
-
                         python3 -m venv venv
                         . venv/bin/activate
                         pip install --upgrade pip
@@ -112,24 +100,23 @@ pipeline {
                         deactivate
                         '''
                     }
-                    echo "Unit Tests completed"
                 }
             }
         }
 
-    stage('Push to Nexus') {
-        steps {
-            withCredentials([usernamePassword(credentialsId: 'nexus-jenkins', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-                script {
-                    sh "docker login -u ${NEXUS_USERNAME} -p ${NEXUS_PASSWORD} http://localhost:8001/repository/polybot/"
-                    sh "docker tag ${IMG_NAME} localhost:8001/repository/polybot/${IMG_NAME}"
-                    sh "docker push localhost:8001/repository/polybot/${IMG_NAME}"
+        stage('Push to Nexus') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'nexus-jenkins', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+                    script {
+                        sh "docker login -u ${NEXUS_USERNAME} -p ${NEXUS_PASSWORD} http://localhost:8001/repository/polybot/"
+                        sh "docker tag ${IMG_NAME} localhost:8001/repository/polybot/${IMG_NAME}"
+                        sh "docker push localhost:8001/repository/polybot/${IMG_NAME}"
                     }
                 }
             }
         }
 
-    stage('Run from another repository/functions') {
+        stage('Run my.py from another repository/library/functions') {
             steps {
                 script {
                     sh '''
@@ -147,17 +134,12 @@ pipeline {
         }
     }
 
-
-
-
-
-
     post {
         always {
             script {
-                def DOCKER_REGISTRY = env.DOCKER_REGISTRY
                 def containerId = sh(script: "docker ps -q -f ancestor=${DOCKER_REGISTRY}:${BUILD_NUMBER}", returnStdout: true).trim()
 
+                // Stop and remove old containers
                 sh """
                     for id in \$(docker ps -a -q -f ancestor=${DOCKER_REGISTRY}:${BUILD_NUMBER}); do
                         if [ "\$id" != "${containerId}" ]; then
@@ -165,13 +147,14 @@ pipeline {
                         fi
                     done
                 """
-            }
-            script {
+
+                // Remove old images
                 sh """
                     docker images --format '{{.Repository}}:{{.Tag}} {{.ID}}' | grep '${DOCKER_REGISTRY}' | grep -v ':latest' | grep -v ':${BUILD_NUMBER}' | awk '{print \$2}' | xargs --no-run-if-empty docker rmi -f || true
                 """
             }
 
+            // Clean up workspace
             cleanWs()
         }
     }
@@ -179,8 +162,6 @@ pipeline {
 
 
 
-
-// ver10
 // pipeline {
 //     agent {
 //         docker {
@@ -227,26 +208,15 @@ pipeline {
 //             }
 //         }
 //
-//         stage('Deploy Dev') {
-//             environment {
-//
-//             }
+//         stage('Deploy polybot to dev') {
 //             steps {
-//                 echo DOCKER_HOST = 'tcp://127.0.0.1:2375'
-//                 echo 'docker-compose -f docker-compose.yaml up -d'
+//                 script {
+//                       //There should be environment variables here, but because there is no cluster or VM to send them it is only an echo command
+//                       echo 'docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up -d'
+//                       echo 'docker-compose -f docker-compose.yaml up -d'
+//                 }
 //             }
 //         }
-//
-//         stage('Deploy Prod') {
-//             environment {
-//
-//             }
-//             steps {
-//                 echo DOCKER_HOST = 'tcp://127.0.0.1:2376'
-//                 echo 'docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up -d'
-//             }
-//         }
-//     }
 //
 //         stage('Test') {
 //             steps {
@@ -322,7 +292,25 @@ pipeline {
 //                 }
 //             }
 //         }
+//
+//     stage('Run from another repository/functions') {
+//             steps {
+//                 script {
+//                     sh '''
+//                     # Clone the repository containing my.py
+//                     git clone https://github.com/eldiabloj/osher-s-shared-lib.git
+//
+//                     # Change directory to the cloned repository
+//                     cd osher-s-shared-lib
+//
+//                     # Run the my.py script
+//                     python3 my.py
+//                     '''
+//                 }
+//             }
+//         }
 //     }
+//
 //
 //
 //
@@ -351,152 +339,7 @@ pipeline {
 //             cleanWs()
 //         }
 //     }
-//
-
-
-
-
-
-//        stage('Unit Test') {
-//             steps {
-//                 script {
-//                     echo "Starting Unit Tests"
-//                     docker.image("${DOCKER_REGISTRY}:${BUILD_NUMBER}").inside {
-//                         sh """
-//                         python3 -m venv venv
-//                         . venv/bin/activate
-//                         pip install --upgrade pip
-//                         pip install -r app/requirements.txt
-//                         pip install pytest-xdist pytest-timeout
-//                         # Run pytest with verbosity and timeout for each test
-//                         python3 -m pytest -n 4 --timeout=60 --junitxml results.xml tests/*.py
-//                         deactivate
-//                         """
-//                     }
-//                     echo "Unit Tests completed"
-//                 }
-//             }
-//         }
-//     }
-// vir9
-// pipeline {
-//     agent {
-//         docker {
-//             image "eldiabloj/polybot:tagname"
-//             args "oj@ubuntu -v /var/run/docker.sock:/var/run/docker.sock"
-//         }
-//     }
-//
-//     environment {
-//         IMG_NAME = "polybot:${BUILD_NUMBER}"
-//         DOCKER_REGISTRY = "eldiabloj/polybot"
-//         SNYK_TOKEN = credentials("snyk-jenkins")
-//     }
-//
-//     parameters {
-//         string(name: 'IMAGE_TAG', defaultValue: '', description: 'eldiabloj/polybot:latest')
-//     }
-//
-//     stages {
-//         stage('Build Docker Image') {
-//             steps {
-//                 withCredentials([usernamePassword(credentialsId: 'docker-jenkinse', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
-//                     script {
-//                         try {
-//                             dir('app') {
-//                                 sh "docker login -u ${USERNAME} -p ${USERPASS}"
-//                                 sh "docker build -t ${IMG_NAME} ."
-//                             }
-//                         } catch (Exception e) {
-//                             echo "Docker build failed: ${e.message}"
-//                             error "Build failed: ${e.message}"
-//                         }
-//                     }
-//                 }
-//             }
-//         }
-//
-//         stage('Snyk Scan') {
-//             steps {
-//                 script {
-//                     // Assuming you have credentials IDs 'username-password' and 'ssh-key' configured in Jenkins
-//                     withCredentials([
-//                         usernamePassword(credentialsId: 'SNYK_TOKEN', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD'),
-//                         string(credentialsId: 'ssh-key', variable: 'SSH_KEY')
-//                     ]) {
-//                         // Access the username and password from environment variables
-//                         sh "echo Username: $USERNAME"
-//                         sh "echo Password: ****"  // Password will be masked
-//
-//                         sh """
-//                           snyk auth
-//                           snyk test --docker ${IMG_NAME}
-//                         """
-//                     }
-//                 }
-//             }
-//         }
-//
-//         stage('Push Docker Image') {
-//             steps {
-//                 script {
-//                     sh "docker tag ${IMG_NAME} ${DOCKER_REGISTRY}:${BUILD_NUMBER}"
-//                     sh "docker push ${DOCKER_REGISTRY}:${BUILD_NUMBER}"
-//                 }
-//             }
-//         }
-//
-//         stage('Deploy polybot to dev') {
-//             steps {
-//                 script {
-//                     docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up -d
-//                        'docker-compose -f docker-compose.yaml up -d'
-//                     sh "kubectl set image deployment/polybot polybot=${params.IMAGE_TAG}"
-//                 }
-//             }
-//         }
-//
-//         stage('Test') {
-//             steps {
-//                 script {
-//                     docker.image("${DOCKER_REGISTRY}:${BUILD_NUMBER}").inside("-w /app") {
-//                         sh '''
-//                         python3 -m venv venv
-//                         . venv/bin/activate
-//                         pip install -r app/requirements.txt
-//                         pylint --disable=C0301,C0114,E1101,C0116,C0103,W0718,E0401,W0613,R1722,W0612,R0912,C0304,C0115,R1705,E1136 app/polybot/*.py
-//                         deactivate
-//                         '''
-//                     }
-//                 }
-//             }
-//         }
-//     }
-//
-//     post {
-//         always {
-//             node {
-//                 script {
-//                     try {
-//                         // Clean up old containers but not the new one
-//                         sh """
-//                             docker ps -a -q -f ancestor=${DOCKER_REGISTRY}:${BUILD_NUMBER} | grep -v `docker ps -q -f ancestor=${DOCKER_REGISTRY}:${BUILD_NUMBER}` | xargs docker rm -f
-//                         """
-//                     } catch (Exception e) {
-//                         echo "Error cleaning up old containers: ${e.message}"
-//                     }
-//
-//                     try {
-//                         // Clean up old Docker images but keep the new one
-//                         sh "docker images -q ${DOCKER_REGISTRY}:${BUILD_NUMBER} | xargs docker rmi -f"
-//                     } catch (Exception e) {
-//                         echo "Error cleaning up old Docker images: ${e.message}"
-//                     }
-//
-//                     // Clean build artifacts from Jenkins workspace
-//                     cleanWs()
-//                 }
-//             }
-//         }
-//     }
 // }
+
+
+
