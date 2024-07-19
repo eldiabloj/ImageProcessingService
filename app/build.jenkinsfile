@@ -47,6 +47,7 @@ pipeline {
         stage('Deploy polybot to dev') {
             steps {
                 script {
+                      //There should be environment variables here, but because there is no cluster or VM to send them it is only an echo command
                       echo 'docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up -d'
                       echo 'docker-compose -f docker-compose.yaml up -d'
                 }
@@ -128,7 +129,7 @@ pipeline {
             }
         }
 
-    stage('Run my.py from another repository') {
+    stage('Run from another repository/functions') {
             steps {
                 script {
                     sh '''
