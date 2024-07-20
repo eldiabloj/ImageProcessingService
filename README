@@ -1,0 +1,214 @@
+#This Jenkins pipeline automates the process of building, testing, and deploying the Polybot application. 
+#It uses Docker for containerization, integrates with Snyk for security scanning, and pushes images to both 
+#Docker Hub and a Nexus repository.
+
+
+#Pipeline Stages
+#Build Docker Image: Builds the Docker image for the Polybot application.
+#Push Docker Image: Tags and pushes the Docker image to Docker Hub.
+#Deploy to Dev: Deploys the Polybot application to the development environment using Docker Compose.
+#Test: Runs linting and other tests inside the Docker container.
+#Verify Docker Image: Verifies the Docker image by listing its details.
+#Snyk Scan: Performs a security scan on the Docker image using Snyk.
+#Unit Test: Runs unit tests on the Polybot application.
+#Push to Nexus: Pushes the Docker image to a Nexus repository.
+#Run External Script: Clones a repository and runs a Python script (my.py) from it.
+
+
+
+#Setup Instructions:
+#Jenkins installed and configured.
+#Docker installed on the Jenkins agent.
+#Credentials for Docker Hub and Nexus stored in Jenkins.
+#Snyk account and API token stored in Jenkins.
+#Global Libraries: Configure the osher-s-shared-lib shared library in Jenkins.
+
+#Parameters:
+#Use the IMAGE_TAG parameter to specify the Docker image
+
+#Triggering the Pipeline:
+#The pipeline can be triggered manually or set to run automatically on code push to git.
+#git repo:https://github.com/eldiabloj/ImageProcessingService.git
+#git repo:https://github.com/eldiabloj/osher-s-shared-lib.git
+
+
+```groovy
+pipeline {
+    agent {
+        docker {
+            image "eldiabloj/dockerfile_agent:latest"
+            args "--user root -v /var/run/docker.sock:/var/run/docker.sock"
+        }
+    }
+
+    environment {
+        IMG_NAME = "polybot:${BUILD_NUMBER}"
+        DOCKER_REGISTRY = "eldiabloj/polybot"
+        SNYK_TOKEN = credentials("SNYK_TOKEN")
+    }
+
+    parameters {
+        string(name: 'IMAGE_TAG', defaultValue: '', description: 'eldiabloj/polybot:latest')
+    }
+
+    stages {
+        stage('Build Docker Image') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'docker-jenkinse', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
+                    script {
+                        try {
+                            dir('app') {
+                                sh "docker login -u ${USERNAME} -p ${USERPASS}"
+                                sh "docker build -t ${IMG_NAME} ."
+                            }
+                        } catch (Exception e) {
+                            echo "Docker build failed: ${e.message}"
+                            error "Build failed: ${e.message}"
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    sh "docker tag ${IMG_NAME} ${DOCKER_REGISTRY}:${BUILD_NUMBER}"
+                    sh "docker push ${DOCKER_REGISTRY}:${BUILD_NUMBER}"
+                }
+            }
+        }
+
+        stage('Deploy polybot to dev') {
+            steps {
+                script {
+                      //There should be environment variables here, but because there is no cluster or VM to send them it is only an echo command
+                      echo 'docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up -d'
+                      echo 'docker-compose -f docker-compose.yaml up -d'
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                script {
+                    docker.image("${DOCKER_REGISTRY}:${BUILD_NUMBER}").inside("-w /app") {
+                        sh '''
+                        python3 -m venv venv
+                        . venv/bin/activate
+                        pip install -r app/requirements.txt
+                        pylint --disable=C0301,C0114,E1101,C0116,C0103,W0718,E0401,W0613,R1722,W0612,R0912,C0304,C0115,R1705,E1136 app/polybot/*.py
+                        deactivate
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('Verify Docker Image') {
+            steps {
+                script {
+                    sh "docker images ${IMG_NAME}"
+                }
+            }
+        }
+
+        stage('Snyk Scan') {
+            steps {
+                script {
+                    withCredentials([
+                        string(credentialsId: 'SNYK_TOKEN', variable: 'SNYK_TOKEN')
+                    ]) {
+                        sh "snyk auth ${SNYK_TOKEN}"
+                        echo "snyk container test ${IMG_NAME} --policy-path=.snyk"
+                    }
+                }
+            }
+        }
+
+        stage('Unit Test') {
+            steps {
+                script {
+                    echo "Starting Unit Tests"
+                    docker.image("${DOCKER_REGISTRY}:${BUILD_NUMBER}").inside {
+                        sh '''
+                        echo "Current directory:"
+                        pwd
+
+
+                        python3 -m venv venv
+                        . venv/bin/activate
+                        pip install --upgrade pip
+                        pip install -r app/requirements.txt
+                        pip install pytest-xdist pytest-timeout
+
+                        # Run pytest with verbosity and timeout for each test
+                        python3 -m pytest -n 4 --timeout=60 --junitxml results.xml app/test/*.py
+                        deactivate
+                        '''
+                    }
+                    echo "Unit Tests completed"
+                }
+            }
+        }
+
+    stage('Push to Nexus') {
+        steps {
+            withCredentials([usernamePassword(credentialsId: 'nexus-jenkins', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+                script {
+                    sh "docker login -u ${NEXUS_USERNAME} -p ${NEXUS_PASSWORD} http://localhost:8001/repository/polybot/"
+                    sh "docker tag ${IMG_NAME} localhost:8001/repository/polybot/${IMG_NAME}"
+                    sh "docker push localhost:8001/repository/polybot/${IMG_NAME}"
+                    }
+                }
+            }
+        }
+
+    stage('Run from another repository/functions') {
+            steps {
+                script {
+                    sh '''
+                    # Clone the repository containing my.py
+                    git clone https://github.com/eldiabloj/osher-s-shared-lib.git
+
+                    # Change directory to the cloned repository
+                    cd osher-s-shared-lib
+
+                    # Run the my.py script
+                    python3 my.py
+                    '''
+                }
+            }
+        }
+    }
+
+
+
+
+
+
+    post {
+        always {
+            script {
+                def DOCKER_REGISTRY = env.DOCKER_REGISTRY
+                def containerId = sh(script: "docker ps -q -f ancestor=${DOCKER_REGISTRY}:${BUILD_NUMBER}", returnStdout: true).trim()
+
+                sh """
+                    for id in \$(docker ps -a -q -f ancestor=${DOCKER_REGISTRY}:${BUILD_NUMBER}); do
+                        if [ "\$id" != "${containerId}" ]; then
+                            docker rm -f \$id || true
+                        fi
+                    done
+                """
+            }
+            script {
+                sh """
+                    docker images --format '{{.Repository}}:{{.Tag}} {{.ID}}' | grep '${DOCKER_REGISTRY}' | grep -v ':latest' | grep -v ':${BUILD_NUMBER}' | awk '{print \$2}' | xargs --no-run-if-empty docker rmi -f || true
+                """
+            }
+
+            cleanWs()
+        }
+    }
+}
+
