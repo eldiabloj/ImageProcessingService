@@ -7,6 +7,8 @@ services:
       - "90:90"
     volumes:
       - ./:/app
+    env_file:
+      - .env
     command: python -m polybot.bot
 
   web:
