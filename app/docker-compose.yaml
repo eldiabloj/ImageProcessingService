@@ -9,7 +9,7 @@ services:
       - ./:/app
     env_file:
       - .env
-    command: python -m polybot.bot
+    command: python -m polybot/bot.py
 
   web:
     build:

@@ -1,3 +1,6 @@
+mastodon.py
+tweepy
+polybot
 python-dotenv
 certifi>=2024.6.2
 charset-normalizer>=3.3.2
