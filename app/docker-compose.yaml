@@ -14,9 +14,9 @@ services:
   web:
     build:
       context: .
-      dockerfile: dockerfile.nginx
+      dockerfile: ng/dockerfile
     ports:
-      - "80:80"
+      - "8005"
 
 
 #API_TOKEN = 'YOUR_BOT_API_TOKEN'
