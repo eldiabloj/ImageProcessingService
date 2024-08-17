@@ -45,7 +45,7 @@ def handle_image(message):
         downloaded_file = bot.download_file(file_info.file_path)
 
         # Save the file temporarily with a unique name based on the file ID
-        image_path = f"../../images/{file_id}.jpg"
+        image_path = f"images/{file_id}.jpg"
         with open(image_path, 'wb') as new_file:
             new_file.write(downloaded_file)
 
