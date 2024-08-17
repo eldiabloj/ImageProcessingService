@@ -10,6 +10,7 @@ pipeline {
         IMG_NAME = "polybot:${BUILD_NUMBER}"
         DOCKER_REGISTRY = "eldiabloj/polybot"
         SNYK_TOKEN = credentials("SNYK_TOKEN")
+        TELEGRAM_TOKEN = credentials('telegarm-token')
     }
 
     parameters {
