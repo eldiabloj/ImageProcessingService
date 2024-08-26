@@ -2,7 +2,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: polybot/Dockerfile
+      dockerfile: Dockerfile
     ports:
       - "90:90"
     volumes:
