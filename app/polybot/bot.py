@@ -1,7 +1,7 @@
 import os
 import telebot
 import cv2
-from polybot.img_proc import Img
+from img_proc import Img
 from dotenv import load_dotenv
 
 
