@@ -1,5 +1,5 @@
 pipeline {
-    agent ( label 'osher-ec2-fleet')
+    agent ( label osher-ec2-fleet)
 
     }
 
@@ -167,3 +167,25 @@ pipeline {
 // docker {
 //             image "eldiabloj/dockerfile_agent:latest"
 //             args "--user root -v /var/run/docker.sock:/var/run/docker.sock"
+
+
+// stage('Select Agent') {
+//     steps {
+//         script {
+//             if (params.AGENT_TYPE == 'ec2') {
+//                 Use the EC2 agent
+//                 agent {
+//                     label 'osher-ec2-fleet'
+//                 }
+//             } else {
+//                 Use the Kubernetes pod agent
+//                 agent {
+//                     docker {
+//                         image "eldiabloj/dockerfile_agent:latest"
+//                         args "--user root -v /var/run/docker.sock:/var/run/docker.sock"
+//                     }
+//                 }
+//             }
+//         }
+//     }
+// }
