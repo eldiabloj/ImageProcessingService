@@ -1,9 +1,6 @@
 pipeline {
-    agent {
-        docker {
-            image "eldiabloj/dockerfile_agent:latest"
-            args "--user root -v /var/run/docker.sock:/var/run/docker.sock"
-        }
+    agent { label "osher-ec2-fleet"}
+
     }
 
     environment {
@@ -167,62 +164,6 @@ pipeline {
     }
 }
 
-
-
-//     post {
-//         always {
-//             script {
-//                 def DOCKER_REGISTRY = env.DOCKER_REGISTRY
-//                 def containerId = sh(script: "docker ps -q -f ancestor=${DOCKER_REGISTRY}:${BUILD_NUMBER}", returnStdout: true).trim()
-//
-//                 sh """
-//                     for id in \$(docker ps -a -q -f ancestor=${DOCKER_REGISTRY}:${BUILD_NUMBER}); do
-//                         if [ "\$id" != "${containerId}" ]; then
-//                             docker rm -f \$id || true
-//                         fi
-//                     done
-//                 """
-//             }
-//             script {
-//                 sh """
-//                     docker images --format '{{.Repository}}:{{.Tag}} {{.ID}}' | grep '${DOCKER_REGISTRY}' | grep -v ':latest' | grep -v ':${BUILD_NUMBER}' | awk '{print \$2}' | xargs --no-run-if-empty docker rmi -f || true
-//                 """
-//             }
-//
-//             cleanWs()
-//         }
-//     }
-// }
-
-
-
-// stage('Push to Nexus') {
-//         steps {
-//             withCredentials([usernamePassword(credentialsId: 'nexus-jenkins', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
-//                 script {
-//                     sh "docker login -u ${NEXUS_USERNAME} -p ${NEXUS_PASSWORD} http://localhost:8001/repository/polybot/"
-//                     sh "docker tag ${IMG_NAME} localhost:8001/repository/polybot/${IMG_NAME}"
-//                     sh "docker push localhost:8001/repository/polybot/${IMG_NAME}"
-//                     }
-//                 }
-//             }
-//         }
-// pipeline {
-//     agent {
-//         kubernetes {
-//             yaml '''
-//             apiVersion: v1
-//             kind: Pod
-//             spec:
-//               containers:
-//               - name: jenkins-agent
-//                 image: jenkins-agent:latest
-//                 command:
-//                 - cat
-//                 tty: true
-//             '''
-//         }
-//     }
-//     ...
-// }
-//
+// docker {
+//             image "eldiabloj/dockerfile_agent:latest"
+//             args "--user root -v /var/run/docker.sock:/var/run/docker.sock"
