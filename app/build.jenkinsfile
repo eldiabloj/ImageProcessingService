@@ -1,5 +1,5 @@
 pipeline {
-    agent { label "osher-ec2-fleet" }
+    agent { label "ec2-fleet" }
 
     environment {
         IMG_NAME = "polybot:${BUILD_NUMBER}"
