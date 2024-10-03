@@ -1,4 +1,4 @@
-FROM python:3.10.12-slim-bullseye
+FROM python:3.13.0rc3-slim-bullseye
 
 # Set environment variables
 ENV PYTHONPATH="${PYTHONPATH}:/app"
