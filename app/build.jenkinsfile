@@ -1,4 +1,4 @@
-ivepipeline {
+pipeline {
     agent { label "osher-ec2-fleet" }
 
     environment {
