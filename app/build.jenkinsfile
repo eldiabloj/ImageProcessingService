@@ -19,7 +19,8 @@ pipeline {
                     script {
                         try {
                             dir('app') {
-                                sh "docker login -u ${USERNAME} -p ${USERPASS}"
+                                // Secure way of logging in using --password-stdin
+                                echo "${USERPASS}" | docker login -u "${USERNAME}" --password-stdin
                                 sh "docker build -t ${IMG_NAME} ."
                             }
                         } catch (Exception e) {
@@ -43,9 +44,8 @@ pipeline {
         stage('Deploy polybot to dev') {
             steps {
                 script {
-                      //There should be environment variables here, but because there is no cluster or VM to send them it is only an echo command
-                      echo 'docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up -d'
-                      echo 'docker-compose -f docker-compose.yaml up -d'
+                    echo 'docker-compose -f docker-compose.yaml -f docker-compose.prod.yaml up -d'
+                    echo 'docker-compose -f docker-compose.yaml up -d'
                 }
             }
         }
@@ -100,11 +100,10 @@ pipeline {
                         echo "Current directory:"
                         pwd
 
-
                         python3 -m venv venv
                         . venv/bin/activate
                         pip install --upgrade pip
-                         pip install mastodon.py tweepy
+                        pip install mastodon.py tweepy
                         grep -v 'polybot' app/requirements.txt > temp2_requirements.txt
                         pip install -r temp2_requirements.txt
                         rm temp2_requirements.txt
@@ -120,26 +119,18 @@ pipeline {
             }
         }
 
-
-
-    stage('Run from another repository/functions') {
+        stage('Run from another repository/functions') {
             steps {
                 script {
                     sh '''
-                    # Clone the repository containing my.py
                     git clone https://github.com/eldiabloj/osher-s-shared-lib.git
-
-                    # Change directory to the cloned repository
                     cd osher-s-shared-lib
-
-                    # Run the my.py script
                     python3 my.py
                     '''
                 }
             }
         }
     }
-
 
     post {
         always {
