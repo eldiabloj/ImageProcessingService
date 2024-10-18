@@ -19,8 +19,10 @@ pipeline {
                     script {
                         try {
                             dir('app') {
-                                sh "docker login -u ${USERNAME} -p ${USERPASS}"
-                                sh "docker build -t ${IMG_NAME} ."
+                                sh """
+                                    echo "${USERPASS}" | docker login -u ${USERNAME} --password-stdin
+                                    docker build -t ${IMG_NAME} .
+                                """
                             }
                         } catch (Exception e) {
                             echo "Docker build failed: ${e.message}"
@@ -161,6 +163,17 @@ pipeline {
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
 
 // docker {
 //             image "eldiabloj/dockerfile_agent:latest"
