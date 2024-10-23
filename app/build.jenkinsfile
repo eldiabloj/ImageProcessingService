@@ -20,7 +20,7 @@ pipeline {
                         try {
                             dir('app') {
                                 sh """
-                                    echo "$DOCKER_PASS" | docker login -u $DOCKER_USER --password-stdin
+                                    echo "$DOCKER_PASS" | sudo docker login -u $DOCKER_USER --password-stdin
                                     docker build -t ${IMG_NAME} .
                                 """
                             }
