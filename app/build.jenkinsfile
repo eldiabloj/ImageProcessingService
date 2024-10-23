@@ -15,12 +15,12 @@ pipeline {
     stages {
         stage('Build Docker Image') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'docker-jenkinse', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
+                withCredentials([usernamePassword(credentialsId: 'docker-jenkinse', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     script {
                         try {
                             dir('app') {
                                 sh """
-                                    echo "${USERPASS}" | docker login -u ${USERNAME} --password-stdin
+                                    echo "$DOCKER_PASS" | docker login -u $DOCKER_USER --password-stdin
                                     docker build -t ${IMG_NAME} .
                                 """
                             }
