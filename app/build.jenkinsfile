@@ -21,7 +21,7 @@ pipeline {
                             dir('app') {
                                 sh '''
                                     echo "$DOCKER_PASS" | sudo docker login -u $DOCKER_USER --password-stdin
-                                    docker build -t ${IMG_NAME} .
+                                    docker buildx build --platform linux/amd64 -t ${IMG_NAME} .
                                 '''
                             }
                         } catch (Exception e) {
