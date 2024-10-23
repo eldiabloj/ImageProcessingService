@@ -19,10 +19,10 @@ pipeline {
                     script {
                         try {
                             dir('app') {
-                                sh """
+                                sh '''
                                     echo "$DOCKER_PASS" | sudo docker login -u $DOCKER_USER --password-stdin
                                     docker build -t ${IMG_NAME} .
-                                """
+                                '''
                             }
                         } catch (Exception e) {
                             echo "Docker build failed: ${e.message}"
