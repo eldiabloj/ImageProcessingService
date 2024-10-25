@@ -150,6 +150,7 @@ pipeline {
     post {
         always {
             script {
+                agent { label params.AGENT_TYPE == 'ec2' ? 'osher-ec2-fleet' : 'kubernetes-pods' }
                 // Stop and remove any running containers related to this build
                 sh """
                     docker ps -q -f ancestor=${DOCKER_REGISTRY}:${BUILD_NUMBER} | xargs -r docker stop
