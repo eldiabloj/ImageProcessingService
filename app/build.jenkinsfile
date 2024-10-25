@@ -9,7 +9,7 @@ pipeline {
         SNYK_TOKEN = credentials("SNYK_TOKEN")
         TELEGRAM_TOKEN = credentials('telegarm-token')
     }
-    agent none // Define the agent at the stage level
+    agent any // Define the agent at the stage level
 
     stages {
         stage('Build Docker Image') {
@@ -127,8 +127,25 @@ pipeline {
                 }
             }
         }
-    }
 
+        stage('Run from another repository/functions') {
+            agent { label params.AGENT_TYPE == 'ec2' ? 'osher-ec2-fleet' : 'kubernetes-pods' }
+            steps {
+                script {
+                    sh '''
+                    # Clone the repository containing my.py
+                    git clone https://github.com/eldiabloj/osher-s-shared-lib.git
+
+                    # Change directory to the cloned repository
+                    cd osher-s-shared-lib
+
+                    # Run the my.py script
+                    python3 my.py
+                    '''
+                }
+            }
+        }
+    }
 
     post {
         always {
