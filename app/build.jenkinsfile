@@ -1,6 +1,6 @@
 pipeline {
     parameters {
-        choice(name: 'AGENT_TYPE', choices: ['kubernetes-pods', 'ec2'], description: 'Select the agent type for the pipeline.')
+        choice(name: 'AGENT_TYPE', choices: ['kubernetes', 'ec2'], description: 'Select the agent type for the pipeline.')
         string(name: 'IMAGE_TAG', defaultValue: '', description: 'eldiabloj/polybot:latest')
     }
     environment {
