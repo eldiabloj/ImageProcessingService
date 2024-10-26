@@ -1,5 +1,5 @@
 pipeline {
-    agent agent { label 'osher-ec2-fleet' }
+    agent { label 'osher-ec2-fleet' }
 
     parameters {
         string(name: 'IMAGE_TAG', defaultValue: '', description: 'eldiabloj/polybot:latest')
