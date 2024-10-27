@@ -10,7 +10,7 @@ pipeline {
         DOCKER_REGISTRY = "eldiabloj/polybot"
         SNYK_TOKEN = credentials("SNYK_TOKEN")
         TELEGRAM_TOKEN = credentials('telegarm-token')
-        ecr_registry = "023196572641.dkr.ecr.us-east-2.amazonaws.com/osher-ecr:latest"
+        ecr_registry = "023196572641.dkr.ecr.us-east-2.amazonaws.com"
         ecr_repo = "${ecr_registry}/osher-ecr:latest"
         aws_region = "us-east-2"
         s3_bucket = "osher-s3-bucket" // Your S3 bucket environment variable
