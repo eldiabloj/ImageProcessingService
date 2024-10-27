@@ -5,10 +5,16 @@ pipeline {
         string(name: 'IMAGE_TAG', defaultValue: '', description: 'eldiabloj/polybot:latest')
     }
     environment {
+         image_tag = "polybot:$BUILD_NUMBER"
         IMG_NAME = "polybot:${BUILD_NUMBER}"
         DOCKER_REGISTRY = "eldiabloj/polybot"
         SNYK_TOKEN = credentials("SNYK_TOKEN")
         TELEGRAM_TOKEN = credentials('telegarm-token')
+        ecr_registry = "023196572641.dkr.ecr.us-east-2.amazonaws.com/osher-ecr"
+        ecr_repo = "${ecr_registry}/osher-ecr/polybot"
+        aws_region = "us-east-2"
+        s3_bucket = "osher-s3-bucket" // Your S3 bucket environment variable
+        sns_topic_arn = "arn:aws:sns:us-east-2:023196572641:osher-polyapp-build" // SNS ARN Topic
     }
 
 
@@ -119,23 +125,67 @@ pipeline {
             }
         }
 
-        stage('Run from another repository/functions') {
+        stage('Push to Amazon ECR') {
             steps {
-                script {
-                    sh '''
-                    # Clone the repository containing my.py
-                    git clone https://github.com/eldiabloj/osher-s-shared-lib.git
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY',
+                    credentialsId: 'AIDAQKZU7TPQ2NYHX4YLMosher-aws'
+                ]]) {
+                    script {
+                        sh """
+                            aws ecr get-login-password --region ${env.aws_region} | docker login --username AWS --password-stdin ${env.ecr_registry}
 
-                    # Change directory to the cloned repository
-                    cd osher-s-shared-lib
+                            docker tag polybot:${env.image_tag}  ${env.ecr_repo}:${env.image_tag}
 
-                    # Run the my.py script
-                    python3 my.py
-                    '''
+
+                            docker push ${env.ecr_repo}:${env.image_tag}
+
+
+//                             docker manifest create ${env.ecr_repo}:${env.image_tag} \\
+//                                 --amend ${env.ecr_repo}:${env.image_tag}-amd64 \\
+//                                 --amend ${env.ecr_repo}:${env.image_tag}-arm64
+//                             docker manifest push ${env.ecr_repo}:${env.image_tag}
+                        """
+                    }
                 }
             }
         }
     }
+
+    post {
+        success {
+            withCredentials([[
+                $class: 'AmazonWebServicesCredentialsBinding',
+                accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                secretKeyVariable: 'AWS_SECRET_ACCESS_KEY',
+                credentialsId: 'AIDAQKZU7TPQ2NYHX4YLMosher-aws'
+            ]]) {
+                sh """
+                    aws sns publish --region ${env.aws_region} --topic-arn ${env.sns_topic_arn} \\
+                        --message "Pipeline succeeded for build #${env.BUILD_NUMBER} on ${env.JOB_NAME}" \\
+                        --subject "Jenkins Pipeline Success Notification"
+                """
+            }
+        }
+        failure {
+            withCredentials([[
+                $class: 'AmazonWebServicesCredentialsBinding',
+                accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                secretKeyVariable: 'AWS_SECRET_ACCESS_KEY',
+                credentialsId: 'AIDAQKZU7TPQ2NYHX4YLMosher-aws'
+            ]]) {
+                sh """
+                    aws sns publish --region ${env.aws_region} --topic-arn ${env.sns_topic_arn} \\
+                        --message "Pipeline failed for build #${env.BUILD_NUMBER} on ${env.JOB_NAME}" \\
+                        --subject "Jenkins Pipeline Failure Notification"
+                """
+            }
+        }
+    }
+}
+
 
     post {
         always {
@@ -156,6 +206,23 @@ pipeline {
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
