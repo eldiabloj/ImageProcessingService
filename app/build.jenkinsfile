@@ -25,7 +25,7 @@ pipeline {
                         try {
                             dir('app/polybot') {
                                 sh "docker login -u ${USERNAME} -p ${USERPASS}"
-                                sh "docker build -t ${IMG_NAME} ./app/polybot"
+                                sh "docker build -t ${IMG_NAME} ."
                             }
                         } catch (Exception e) {
                             echo "Docker build failed: ${e.message}"
