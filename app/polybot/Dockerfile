@@ -26,7 +26,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY .. .
 
 # Set the working directory to the application directory
-WORKDIR /app/polybot/
+WORKDIR /app/polybot
 
 # Expose the port if needed
 EXPOSE 90
