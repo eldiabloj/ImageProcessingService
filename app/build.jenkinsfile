@@ -57,13 +57,13 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    docker.image("${DOCKER_REGISTRY}:${BUILD_NUMBER}").inside("-w /app") {
+                    docker.image("${DOCKER_REGISTRY}:${BUILD_NUMBER}").inside("-w /app/polybot") {
                         sh '''
                         python3 -m venv venv
                         . venv/bin/activate
                         pip install --upgrade pip
                         pip install mastodon.py tweepy
-                        grep -v 'polybot' app/requirements.txt > temp_requirements.txt
+                        grep -v 'polybot' app/polybot/requirements.txt > temp_requirements.txt
                         pip install -r temp_requirements.txt
                         rm temp_requirements.txt
                         pylint --disable=C0301,C0114,E1101,C0116,C0103,W0718,E0401,W0613,R1722,W0612,R0912,C0304,C0115,R1705,E1136 app/polybot/*.py
@@ -108,13 +108,13 @@ pipeline {
                         . venv/bin/activate
                         pip install --upgrade pip
                         pip install mastodon.py tweepy
-                        grep -v 'polybot' app/requirements.txt > temp2_requirements.txt
+                        grep -v 'polybot' app/polybot/requirements.txt > temp2_requirements.txt
                         pip install -r temp2_requirements.txt
                         rm temp2_requirements.txt
                         pip install pytest-xdist pytest-timeout
 
                         # Run pytest with verbosity and timeout for each test
-                        python3 -m pytest -n 4 --timeout=60 --junitxml results.xml app/test/*.py
+                        python3 -m pytest -n 4 --timeout=60 --junitxml results.xml app/polybot/test/*.py
                         deactivate
                         '''
                     }
