@@ -4,7 +4,7 @@ FROM python:3.10.12-slim-bullseye
 ENV PYTHONPATH="${PYTHONPATH}:/app"
 
 # Set working directory
-WORKDIR /app
+WORKDIR /app/polybot
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -23,7 +23,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application files to the working directory
-COPY app/polybot .
+COPY .. .
 
 # Set the working directory to the application directory
 WORKDIR /app/polybot
