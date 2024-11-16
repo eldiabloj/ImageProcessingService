@@ -197,4 +197,3 @@ pipeline {
 
 
 
-// s3_bucket = "osher-s3-bucket" // Your S3 bucket environment variable
