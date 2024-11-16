@@ -124,8 +124,8 @@ celerybeat.pid
 snyk
 minikube-linux-amd64
 minikube
-polybot/kubectl.sha256
-polybot/kubectl
+
+
 .venv
 env/
 venv/
