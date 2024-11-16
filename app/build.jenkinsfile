@@ -23,7 +23,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'docker-jenkinse', usernameVariable: 'USERNAME', passwordVariable: 'USERPASS')]) {
                     script {
                         try {
-                            dir('app') {
+                            dir('app/polybot') {
                                 sh "docker login -u ${USERNAME} -p ${USERPASS}"
                                 sh "docker build -t ${IMG_NAME} ."
                             }
