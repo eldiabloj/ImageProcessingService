@@ -6,6 +6,7 @@ ENV PYTHONPATH="${PYTHONPATH}:/app"
 # Set working directory
 WORKDIR /app
 
+
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     libglib2.0-0 \
@@ -27,7 +28,7 @@ COPY . .
 
 # Set the working directory to the application directory
 WORKDIR /app/polybot
-
+RUN mkdir /app/polybot/images
 # Expose the port if needed
 EXPOSE 90
 
